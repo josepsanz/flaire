@@ -1,0 +1,54 @@
+db: my-list
+user: jm
+
+track:
+  - name: Asad
+    brand: Lattafa
+    type: edp
+    size: 100
+    links:
+      - https://www.notino.es/lattafa/asad-eau-de-parfum-para-hombre/p-16145677/
+      - https://www.brasty.es/lattafa-asad-eau-de-parfum-para-hombre-100-ml
+      - https://www.druni.es/asad-lattafa-eau-parfum-hombre
+
+  - name: Asad Bourbon
+    brand: Lattafa
+    type: edp
+    size: 100
+    links:
+      - https://www.druni.es/asad-bourbon-lattafa-eau-parfum-hombre
+
+  - name: Supremacy Not Only Intense Perfume (150ml)
+    brand: Afnan
+    type: edp
+    size: 150
+    links:
+      - https://www.brasty.es/afnan-supremacy-not-only-intense-perfume-para-hombre-150-ml
+
+  - name: Supremacy Not Only Intense Perfume (100ml)
+    brand: Afnan
+    type: edp
+    size: 100
+    links:
+      - https://www.brasty.es/afnan-supremacy-not-only-intense-eau-de-parfum-para-hombre-100-ml
+
+  - name: Sumpremacy Collector's Edition
+    brand: Afnan
+    type: edp
+    size: 100
+    links:
+      - https://www.deloox.es/producto/1343240/afnan-supremacy-eau-de-parfum-edicion-de-coleccionista-100-ml.html
+
+  - name: Odyssey Mandarin Sky Elixir
+    brand: Armaf
+    type: elixir
+    size: 100
+    links:
+      - https://www.miravia.es/p/armaf-odyssey-mandarin-sky-elixir-eau-de-parfum-100ml-perume-arabe-original-para-hombre-i1373294636273528.html
+
+  - name: Khamrah Qahwa
+    brand: Lattafa
+    type: edp
+    size: 100
+    links:
+      - https://www.amazon.es/dp/B0CWBS4NN7
