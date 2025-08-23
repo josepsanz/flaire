@@ -1,0 +1,41 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'flaire'
+authors = [
+    {name = 'josep sanz', email = 'jsanz83@gmail.com'}
+]
+description = 'Flaire aims to be more than just a scraper; it wants to be a price-monitoring tool for perfumes to detect interesting deals.'
+
+license = {file = 'LICENSE.txt'}
+keywords = ['flaire']
+requires-python = '>=3.13'
+
+dependencies = [
+  'botasaurus>=4.0.88',
+  'pandas>=2.3.1',
+  'PyYAML>=6.0.2'
+]
+
+dynamic = ['version', 'readme']
+
+# Packaging: Setuptools
+#
+[tool.setuptools.dynamic]
+version = {attr = 'flaire._version.__version__'}
+readme = {file = ['README.md']}
+
+[tool.setuptools.packages.find]
+where = ['src']
+#include = ['*']
+namespaces = true
+
+# Linter: Ruff
+#
+[tool.ruff.lint]
+ignore = ['E501', 'E722']
+
+[tool.ruff.lint.per-file-ignores]
+'flaire/__init__.py' = ['F401']
