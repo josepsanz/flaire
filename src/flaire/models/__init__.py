@@ -15,6 +15,9 @@ class PerfumeType(enum.Enum):
 
 class Perfume(Base):
     __tablename__ = 'perfums'
+    __table_args__ = (
+        sa.UniqueConstraint('hash', name='uq_perfume_hash'),
+    )
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False)
