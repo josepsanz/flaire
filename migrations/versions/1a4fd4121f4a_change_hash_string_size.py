@@ -36,7 +36,7 @@ def downgrade():
             existing_nullable=False
         )
 
-# Autogeneratecode with
+# Autogeneratecode with alembic revision --autogenerate
 #
 # def upgrade() -> None:
 #     """Upgrade schema."""
