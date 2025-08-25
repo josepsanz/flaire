@@ -1,4 +1,4 @@
-user: jm
+database: test
 
 track:
   - name: Asad
@@ -9,6 +9,7 @@ track:
       - https://www.notino.es/lattafa/asad-eau-de-parfum-para-hombre/p-16145677/
       - https://www.brasty.es/lattafa-asad-eau-de-parfum-para-hombre-100-ml
       - https://www.druni.es/asad-lattafa-eau-parfum-hombre
+      - https://www.douglas.es/es/p/5011503009
 
   - name: Asad Bourbon
     brand: Lattafa
@@ -23,6 +24,7 @@ track:
     size: 150
     links:
       - https://www.brasty.es/afnan-supremacy-not-only-intense-perfume-para-hombre-150-ml
+      - https://www.ferwer.es/afnan-supremacy-not-only-intense-extracto-de-perfume-para-hombres
 
   - name: Supremacy Not Only Intense Perfume (100ml)
     brand: Afnan

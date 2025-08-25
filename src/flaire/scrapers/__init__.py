@@ -1,5 +1,3 @@
-import yaml
-import pandas as pd
 from botasaurus.browser import browser, Driver
 from botasaurus.request import request, Request
 from botasaurus.soupify import soupify
@@ -10,7 +8,6 @@ def get_soup_from_url(request, url):
 
     soup = soupify(response)
     return soup
-
 
 def clean_price_text(text):
     return float(text.replace('€', '').replace(',', '.').replace('\n', '').replace(' ', ''))
@@ -103,19 +100,20 @@ def scrape_amazon_price(request: Request, data):
 
     return price
 
-def main():
-    tasks = {
-        'Notino - Lattafa - Asad': scrape_notino_price(data={'url': 'https://www.notino.es/lattafa/asad-eau-de-parfum-para-hombre/p-16145677/'}),
-        'Brasty - Afnan - Supremacy Not Only Intense': scrape_brasty_price(data={'url': 'https://www.brasty.es/afnan-supremacy-not-only-intense-perfume-para-hombre-150-ml'}),
-        'Druni - Lattafa - Asad Bourbon': scrape_druni_price(data={'url': 'https://www.druni.es/asad-bourbon-lattafa-eau-parfum-hombre'}),
-        'Primor - Halloween - Halloween Man X': scrape_primor_price(data={'url': 'https://www.primor.eu/es_es/halloween-halloween-man-x-edt-112384.html?#854=66504'}),
-        "Deloox - Afnan - Supremacy Collector's": scrape_deloox_price(data={'url': 'https://www.deloox.es/producto/1343240/afnan-supremacy-eau-de-parfum-edicion-de-coleccionista-100-ml.html'}),
-        'Miravia - Armaf - Odyssey Mandarin Sky Elixir': scrape_miravia_price(data={'url': 'https://www.miravia.es/p/armaf-odyssey-mandarin-sky-elixir-eau-de-parfum-100ml-perume-arabe-original-para-hombre-i1373294636273528.html'}),
-        'Amazon - Lattafa - Khamrah Qahwa': scrape_amazon_price(data={'url': 'https://www.amazon.es/dp/B0CWBS4NN7'})
-    }
+@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+def scrape_douglas_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
 
-    for key, task in tasks.items():
-        print(f'{key:64} {task.get()}€')
+    obj = soup.find('div', class_='discounted-price__row').find_all('div')[-1]
+    price = get_price(obj)
 
-if __name__ == '__main__':
-    main()
+    return price
+
+@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+def scrape_ferwer_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
+
+    obj = soup.find('span', id='api_price')
+    price = get_price(obj)
+
+    return price
