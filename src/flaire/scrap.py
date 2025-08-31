@@ -1,11 +1,9 @@
 import urllib
 import argparse
 
-import yaml
-
 from . import scrapers as sc
 
-MERCHANT_SCRAPERS_LU = {
+_MERCHANT_SCRAPERS_LU = {
     'notino.es': sc.scrape_notino_price,
     'brasty.es': sc.scrape_brasty_price,
     'druni.es': sc.scrape_druni_price,
@@ -17,18 +15,23 @@ MERCHANT_SCRAPERS_LU = {
     'amazon.es': sc.scrape_amazon_price,
 }
 
+def get_merchant_scraper(url: str):
+    merchant = urllib.parse.urlparse(url).netloc.replace('www.', '')
+    merchant_scraper = _MERCHANT_SCRAPERS_LU[merchant]
+    return merchant, merchant_scraper
+
 def get_arguments():
     parser = argparse.ArgumentParser(
         prog='python -m flaire.scrap',
         description='Flaire scraper',
-        epilog='Scrap, track and smell!'
+        epilog='Scrap a single url'
     )
 
-    parser.add_argument('filename', help='YaML file with targets to scrap')
+    parser.add_argument('url', help='url to scrap')
     arguments = parser.parse_args()
     return arguments
 
-def scrap(targets):
+def _scrap(targets):
     tasks = {
         'Notino - Lattafa - Asad': {
             'url': 'https://www.notino.es/lattafa/asad-eau-de-parfum-para-hombre/p-16145677/'
@@ -68,13 +71,15 @@ def scrap(targets):
     for name, data in tasks.items():
         print(f"{name:64} {data['task'].get()}€")
 
+def scrap(url):
+    _, merchant_scraper = get_merchant_scraper(url)
+    task = merchant_scraper(data={'url': url})
+    price = task.get()
+    print(f'{url}: {price}€')
+
 def main():
     arguments = get_arguments()
-
-    with open(arguments.filename, 'r') as fp:
-        targets = yaml.load(fp, Loader=yaml.SafeLoader)
-
-    scrap(targets)
+    scrap(arguments.url)
 
 if __name__ == '__main__':
     main()

@@ -1,6 +1,20 @@
+import functools
+
 from botasaurus.browser import browser, Driver
 from botasaurus.request import request, Request
 from botasaurus.soupify import soupify
+
+MAX_RETRY = 0
+RETRY_WAIT = 0
+
+scrap_request = functools.partial(
+    request,
+    max_retry=MAX_RETRY,
+    retry_wait=RETRY_WAIT,
+    run_async=True,
+    close_on_crash=True,
+    output=None
+)
 
 def get_soup_from_url(request, url):
     response = request.get(url)
@@ -16,16 +30,16 @@ def get_price(obj):
     text = obj.get_text()
     return clean_price_text(text)
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_notino_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
-    obj = soup.find(id='pd-price')
+    obj = soup.find(id='pd-price') or soup.find('span', {'data-testid': 'pd-price-wrapper'})
     price = get_price(obj)
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_brasty_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -34,7 +48,7 @@ def scrape_brasty_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_druni_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -64,7 +78,7 @@ def _scrape_primor_price(driver, data):
 
     return {"size": "125 ml", "price": price}
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@request(max_retry=MAX_RETRY, run_async=True, close_on_crash=True, output=None)
 def scrape_primor_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -73,7 +87,7 @@ def scrape_primor_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@request(max_retry=MAX_RETRY, run_async=True, close_on_crash=True, output=None)
 def scrape_deloox_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -82,7 +96,7 @@ def scrape_deloox_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_miravia_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -91,7 +105,7 @@ def scrape_miravia_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_amazon_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -100,7 +114,7 @@ def scrape_amazon_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_douglas_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -109,7 +123,7 @@ def scrape_douglas_price(request: Request, data):
 
     return price
 
-@request(max_retry=10, run_async=True, close_on_crash=True, output=None)
+@scrap_request
 def scrape_ferwer_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
