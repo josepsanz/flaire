@@ -1,4 +1,4 @@
-database: test
+database: perfumes.db
 
 track:
   - name: Asad
@@ -18,6 +18,7 @@ track:
     links:
       - https://www.notino.es/lattafa/asad-bourbon-eau-de-parfum-para-hombre
       - https://www.druni.es/asad-bourbon-lattafa-eau-parfum-hombre
+      - https://www.deloox.es/producto/1351503/lattafa-asad-bourbon-eau-de-parfum-100-ml.html
 
   - name: Supremacy Not Only Intense Perfume (150ml)
     brand: Afnan
