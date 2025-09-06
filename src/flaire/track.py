@@ -6,6 +6,7 @@ import datetime
 
 import yaml
 import pandas as pd
+import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -14,6 +15,7 @@ from . import scrapers as sc
 from . import models
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class Tracker:
@@ -21,8 +23,11 @@ class Tracker:
         with open(filename, 'r') as fp:
             self.contract = yaml.load(fp, Loader=yaml.SafeLoader)
 
-        #self._engine = create_engine(f"sqlite:///{self.contract['database']}")
-        #self._session = sessionmaker(bind=self._engine)
+        self._connect_db()
+
+    def _connect_db(self):
+        self._engine = create_engine(f"sqlite:///{self.contract['database']}")
+        self._session = sessionmaker(bind=self._engine)
 
     @classmethod
     def get_tasks(cls, target: dict):
@@ -73,52 +78,86 @@ class Tracker:
         return df
 
     @classmethod
-    def _insert_merchant(cls, session, name):
-        pass
+    def get_entity_id_by_name(cls, session, model, entity_name):
+        stmt = sa.select(model.id).where(model.name == entity_name)
+        if hasattr(model, '__lut__') is False:
+            entity_id = session.scalar(stmt)
+        elif (entity_id := model.__lut__.get(entity_name)) is None:
+            if (entity_id := session.scalar(stmt)):
+                model.__lut__[entity_name] = entity_id
+
+        return entity_id
 
     @classmethod
-    def _insert_brand(cls, session, name):
-        pass
+    def _insert_merchant(cls, session, merchant):
+        merchant_id = cls.get_entity_id_by_name(session, models.Merchants, merchant)
+        if not merchant_id:
+            session.add(models.Merchants(name=merchant))
+
+    @classmethod
+    def _insert_brand(cls, session, brand):
+        brand_id = cls.get_entity_id_by_name(session, models.Brands, brand)
+        if not brand_id:
+            session.add(models.Brands(name=brand))
 
     @classmethod
     def _insert_perfum(cls, session, name: str, brand: str, type_: str, size: int, sig: str):
-        perfum = models.Perfume(
-            name=name,
-            brand=brand,
-            type=type_,
-            size=size,
-            sig=sig,
-        )
-        try:
+        if not cls.get_entity_id_by_name(session, models.Perfums, name):
+            brand_id = cls.get_entity_id_by_name(session, models.Brands, brand)
+            perfum = models.Perfums(
+                name=name,
+                brand_id=brand_id,
+                type=type_,
+                size=int(size),
+                sig=sig
+            )
             session.add(perfum)
-        except IntegrityError:
-            session.rollback()
-            logger.warning(f'{name} perfume from {brand} is already in the database. Skip!')
 
     @classmethod
-    def _insert_price(cls, merchant: str, price: str):
-        pass
+    def _insert_price(cls, session, perfum_name: str, merchant_name: str, price: float):
+        perfum_id = cls.get_entity_id_by_name(session, models.Perfums, perfum_name)
+        merchant_id = cls.get_entity_id_by_name(session, models.Merchants, merchant_name)
+        price = int(100 * price)
+        ts = datetime.datetime.now()
+        price = models.Prices(perfum_id=perfum_id, merchant_id=merchant_id, ts=ts, price=price)
+        session.add(price)
 
     def insert_data(self, df: pd.DataFrame):
-        ts = datetime.datetime.now()
-        gg = dg.groupby('sig')
         with self._session() as session:
-            for sig, group in gg.groups:
+            # Insert merchants
+            for merchant in df['merchant'].unique():
+                self._insert_merchant(session, merchant)
+            session.commit()
+
+            # Insert brands
+            for brand in df['brand'].unique():
+                self._insert_brand(session, brand)
+            session.commit()
+
+            # Insert perfums and prices
+            groups = df.groupby('sig')
+            for sig, group in groups:
                 pf = group.iloc[0]
+                perfum_name = pf['name']
+
                 self._insert_perfum(
-                    name=pf['name'],
+                    session,
+                    name=perfum_name,
                     brand=pf['brand'],
                     type_=pf['type'],
                     size=pf['size'],
                     sig=pf['sig']
                 )
-                for _, row in group.iterrow():
-                    merchant = row['merchant']
-                    price = row['price']
-                    sig = sig
+                session.commit()
+
+                for _, row in group.iterrows():
+                    merchant_name = row['merchant']
+                    self._insert_price(session, perfum_name, merchant_name, row['price'])
+                session.commit()
 
     def track(self):
         df = self.get_df(self.contract['track'])
+        df.dropna(subset='price', inplace=True)
         return df
 
 def get_arguments():
@@ -137,7 +176,8 @@ def main():
 
     tracker = Tracker(arguments.filename)
     df = tracker.track()
-    #df.set_index('sig', inplace=True)
+    tracker.insert_data(df)
+
     print(df)
 
 if __name__ == '__main__':

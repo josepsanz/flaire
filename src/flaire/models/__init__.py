@@ -9,8 +9,8 @@ Base = declarative_base()
 merchant_perfum = sa.Table(
     'merchant_perfum',
     Base.metadata,
-    sa.Column('merchant_id', sa.Integer, sa.ForeignKey('merchant.id', ondelete='CASCADE'), primary_key=True),
-    sa.Column('perfum_id', sa.Integer, sa.ForeignKey('perfum.id', ondelete='CASCADE'), primary_key=True)
+    sa.Column('merchant_id', sa.Integer, sa.ForeignKey('merchants.id', ondelete='CASCADE'), primary_key=True),
+    sa.Column('perfum_id', sa.Integer, sa.ForeignKey('perfums.id', ondelete='CASCADE'), primary_key=True)
 )
 
 class PerfumType(enum.Enum):
@@ -20,76 +20,93 @@ class PerfumType(enum.Enum):
     elixir = 'elixir'
     extract = 'extract'
 
-class Merchant(Base):
-    __tablename__ = 'merchant'
+class FlaireBase:
+    @classmethod
+    def norm_text(cls, text):
+        return text.title().replace(' ', '')
+
+class Merchants(FlaireBase, Base):
+    __tablename__ = 'merchants'
+    __lut__ = {}
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False, unique=True)
     perfums = relationship(
-        'Perfum',
+        'Perfums',
         secondary=merchant_perfum,
-        back_populates='merchants',
+        back_populates='merchant',
+        passive_deletes=True
+    )
+
+    prices = relationship(
+        'Prices',
+        back_populates='merchant',
+        cascade='all, delete-orphan',
         passive_deletes=True
     )
 
     def __repr__(self):
-        return f'<Merchant(name={self.name})>'
+        return f'<{self.__class__.__name__}(name={self.name})>'
 
-class Brand(Base):
-    __tablename__ = 'brand'
+class Brands(FlaireBase, Base):
+    __tablename__ = 'brands'
+    __lut__ = {}
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False, unique=True)
 
     perfums = relationship(
-        'Perfum',
+        'Perfums',
         back_populates='brand',
         cascade='all, delete-orphan',
         passive_deletes=True
     )
 
     def __repr__(self):
-        return f'<Brand(name={self.name})>'
+        return f'<{self.__class__.__name__}(name={self.name})>'
 
-class Perfum(Base):
-    __tablename__ = 'perfum'
+class Perfums(FlaireBase, Base):
+    __tablename__ = 'perfums'
     __table_args__ = (
         sa.UniqueConstraint('sig', name='uq_perfum_sig'),
     )
+    __lut__ = {}
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False)
-    brand_id = sa.Column(sa.Integer, sa.ForeignKey('brand.id', ondelete='CASCADE'), nullable=False)
+    brand_id = sa.Column(sa.Integer, sa.ForeignKey('brands.id', ondelete='CASCADE'), nullable=False)
     type = sa.Column(sa.Enum(PerfumType), nullable=False)
     size = sa.Column(sa.Integer, nullable=False)
     sig = sa.Column(sa.String(32), nullable=False, unique=True)  # md5 hash hex string
 
-    brand = relationship('Brand', back_populates='perfums')
-    merchants = relationship(
-        'Merchant',
+    brand = relationship('Brands', back_populates='perfums')
+    merchant = relationship(
+        'Merchants',
         secondary=merchant_perfum,
         back_populates='perfums',
         passive_deletes=True
     )
     prices = relationship(
-        'Price',
+        'Prices',
         back_populates='perfum',
         cascade='all, delete-orphan',
         passive_deletes=True
     )
 
     def __repr__(self):
-        return f'<Perfum(name={self.name}, type={self.type}, size={self.size})>'
+        return f'<{self.__class__.__name__}(name={self.name}, type={self.type}, size={self.size})>'
 
-class Price(Base):
-    __tablename__ = 'price'
+class Prices(FlaireBase, Base):
+    __tablename__ = 'prices'
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    perfum_id = sa.Column(sa.Integer, sa.ForeignKey('perfum.id', ondelete='CASCADE'), nullable=False)
+    perfum_id = sa.Column(sa.Integer, sa.ForeignKey('perfums.id', ondelete='CASCADE'), nullable=False)
+    merchant_id = sa.Column(sa.Integer, sa.ForeignKey('merchants.id', ondelete='CASCADE'), nullable=False)
     ts = sa.Column(sa.DateTime, default=datetime.datetime.now, nullable=False)
     price = sa.Column(sa.Integer, nullable=False)
 
-    perfum = relationship('Perfum', back_populates='prices')
+    perfum = relationship('Perfums', back_populates='prices')
+    merchant = relationship('Merchants', back_populates='prices')
 
     def __repr__(self):
-        return f'<Price(perfum_id={self.perfum_id}, ts={self.ts}, price={self.price})>'
+        return f'<{self.__class__.__name__}(perfum_id={self.perfum_id}, ts={self.ts}, price={self.price})>'

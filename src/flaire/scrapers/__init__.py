@@ -1,4 +1,7 @@
+import logging
 import functools
+
+from colorama import Fore, Style
 
 from botasaurus.browser import browser, Driver
 from botasaurus.request import request, Request
@@ -6,6 +9,8 @@ from botasaurus.soupify import soupify
 
 MAX_RETRY = 0
 RETRY_WAIT = 0
+
+logger = logging.getLogger(__name__)
 
 scrap_request = functools.partial(
     request,
@@ -30,7 +35,23 @@ def get_price(obj):
     text = obj.get_text()
     return clean_price_text(text)
 
+def safe_price(func):
+    @functools.wraps(func)
+    def wrapper_price(*args, **kwargs):
+        try:
+            price = func(*args, **kwargs)
+        except:
+            _, data = args
+            url = data['url']
+            logger.warning(f"{Fore.RED}✘{Style.RESET_ALL} Something wrong with '{url}'.", exc_info=False)
+            price = None
+        finally:
+            return price
+    ###
+    return wrapper_price
+
 @scrap_request
+@safe_price
 def scrape_notino_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -40,6 +61,7 @@ def scrape_notino_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_brasty_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -49,6 +71,7 @@ def scrape_brasty_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_druni_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -78,7 +101,8 @@ def _scrape_primor_price(driver, data):
 
     return {"size": "125 ml", "price": price}
 
-@request(max_retry=MAX_RETRY, run_async=True, close_on_crash=True, output=None)
+@scrap_request
+@safe_price
 def scrape_primor_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -87,7 +111,8 @@ def scrape_primor_price(request: Request, data):
 
     return price
 
-@request(max_retry=MAX_RETRY, run_async=True, close_on_crash=True, output=None)
+@scrap_request
+@safe_price
 def scrape_deloox_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -97,6 +122,7 @@ def scrape_deloox_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_miravia_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -106,6 +132,7 @@ def scrape_miravia_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_amazon_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -115,6 +142,7 @@ def scrape_amazon_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_douglas_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
@@ -124,6 +152,7 @@ def scrape_douglas_price(request: Request, data):
     return price
 
 @scrap_request
+@safe_price
 def scrape_ferwer_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 

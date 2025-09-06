@@ -22,6 +22,7 @@ Edit `alembic.ini` and `migrations/env.py` as needed for your project.
 
 3. Run the following commands (for PostgreSQL and MariaDB, the database must already be created):
 ```
+rm -rf perfums.db migrations/versions/* 
 alembic revision --autogenerate -m "initial schema"
 alembic upgrade head
 ```
