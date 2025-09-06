@@ -7,8 +7,8 @@ from botasaurus.browser import browser, Driver
 from botasaurus.request import request, Request
 from botasaurus.soupify import soupify
 
-MAX_RETRY = 0
-RETRY_WAIT = 0
+MAX_RETRY = 3
+RETRY_WAIT = 10
 
 logger = logging.getLogger(__name__)
 

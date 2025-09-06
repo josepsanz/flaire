@@ -21,9 +21,7 @@ class PerfumType(enum.Enum):
     extract = 'extract'
 
 class FlaireBase:
-    @classmethod
-    def norm_text(cls, text):
-        return text.title().replace(' ', '')
+    pass
 
 class Merchants(FlaireBase, Base):
     __tablename__ = 'merchants'

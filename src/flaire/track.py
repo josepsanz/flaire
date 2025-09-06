@@ -30,6 +30,11 @@ class Tracker:
         self._session = sessionmaker(bind=self._engine)
 
     @classmethod
+    def norm_text(cls, text):
+        return text.lower()
+        #return text.title().replace(' ', '')
+
+    @classmethod
     def get_tasks(cls, target: dict):
         for url in target['links']:
             merchant, merchant_scraper = scrap.get_merchant_scraper(url)
@@ -43,7 +48,7 @@ class Tracker:
 
     @classmethod
     def get_signature(cls, name, brand, type_, size):
-        data_sig = f'{name.lower()} - {brand.lower()} - {type_.lower()} - {size}'
+        data_sig = f'{name} - {brand} - {type_} - {size}'
         md5 = hashlib.md5(data_sig.encode('utf-8'))
         return md5.hexdigest()
 
@@ -61,11 +66,11 @@ class Tracker:
             price = task['task'].get()
             yield {
                 'sig': sig,
-                'name': name,
-                'brand': brand,
-                'type': type_,
+                'name': cls.norm_text(name),
+                'brand': cls.norm_text(brand),
+                'type': type_.lower(),
                 'size': size,
-                'merchant': merchant,
+                'merchant': cls.norm_text(merchant),
                 'price': price
             }
 
@@ -92,13 +97,15 @@ class Tracker:
     def _insert_merchant(cls, session, merchant):
         merchant_id = cls.get_entity_id_by_name(session, models.Merchants, merchant)
         if not merchant_id:
-            session.add(models.Merchants(name=merchant))
+            entity = models.Merchants(name=merchant)
+            session.add(entity)
 
     @classmethod
     def _insert_brand(cls, session, brand):
         brand_id = cls.get_entity_id_by_name(session, models.Brands, brand)
         if not brand_id:
-            session.add(models.Brands(name=brand))
+            entity = models.Brands(name=brand)
+            session.add(entity)
 
     @classmethod
     def _insert_perfum(cls, session, name: str, brand: str, type_: str, size: int, sig: str):
