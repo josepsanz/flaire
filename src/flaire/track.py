@@ -5,6 +5,7 @@ import argparse
 import datetime
 
 import yaml
+import colorama
 import pandas as pd
 import sqlalchemy as sa
 from sqlalchemy import create_engine
@@ -186,6 +187,9 @@ def main():
     tracker.insert_data(df)
 
     print(df)
+    print()
+
+    print(f'--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py{colorama.Style.RESET_ALL}')
 
 if __name__ == '__main__':
     main()
