@@ -74,8 +74,23 @@ def main_view(last_prices_df):
     st.dataframe(last_prices_df, hide_index=True)
 
     with st.sidebar:
-        perfum = st.selectbox('Target Perfum:', ['Perfum A', 'Perfum B', 'Perfum C'])
+        choices = (
+            f'{perfum} - {brand}'
+            for perfum, brand in last_prices_df.groupby(['perfum', 'brand']).groups
+        )
+        perfum = st.selectbox('Target Perfum:', choices)
         st.write(f'Your choice: {perfum}')
+
+    st.markdown(
+        f'''
+        <style>
+            .sidebar .sidebar-content {{
+                width: 33%;
+            }}
+        </style>
+        ''',
+        unsafe_allow_html=True
+    )
 
 def main():
     arguments = get_arguments()
