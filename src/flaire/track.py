@@ -189,7 +189,7 @@ def main():
     print(df)
     print()
 
-    print(f'--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py{colorama.Style.RESET_ALL}')
+    print(f"--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py {tracker.contract['database']}{colorama.Style.RESET_ALL}")
 
 if __name__ == '__main__':
     main()

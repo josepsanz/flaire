@@ -27,5 +27,5 @@ python -m flaire.track tests/fixtures/track.yml
 Historic prices viewer
 
 ``` sh
-streamlit run src/flaire/panel.py
+streamlit run src/flaire/panel.py DATABASE
 ```
