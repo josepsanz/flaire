@@ -10,13 +10,20 @@ import streamlit as st
 from flaire import models
 
 
-
 class Controller:
     DELTA = datetime.timedelta(days=180)
 
     def __init__(self, database):
         self._engine = create_engine(f"sqlite:///{database}")
         self._session = sessionmaker(bind=self._engine)
+        self._df = None
+
+    @property
+    def df(self):
+        if self._df is None:
+            self._df = self.get_prices_ts()
+
+        return self._df
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
         dt = datetime.datetime.now()
@@ -44,7 +51,7 @@ class Controller:
             return df
 
     def get_last_prices(self):
-        df = self.get_prices_ts()
+        df = self.df
         groups = df.groupby(['perfum', 'merchant'])
 
         it = (group.iloc[-1] for (perfum, merchant), group in groups)
@@ -62,7 +69,22 @@ def get_arguments():
     arguments = parser.parse_args()
     return arguments
 
-def main_view(last_prices_df):
+def side_view(controller):
+    with st.sidebar:
+        choices = {
+            f'{perfum} - {brand}': (perfum, brand)
+            for perfum, brand in controller.df.groupby(['perfum', 'brand']).groups
+        }
+        perfum_brand = st.selectbox('Target Perfum:', choices)
+        st.write(f'Your choice: {perfum_brand}')
+
+    return choices[perfum_brand]
+
+def main_view(controller):
+    df = controller.df
+    last_prices_df = controller.get_last_prices()
+    last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
+
     st.set_page_config(
         page_title='Flaire Panel',
         page_icon='🧴'
@@ -70,16 +92,17 @@ def main_view(last_prices_df):
 
     st.write('# Flaire Panel')
 
-    last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
+    perfum, brand = side_view(controller)
+
+    st.write('## Current Prices')
     st.dataframe(last_prices_df, hide_index=True)
 
-    with st.sidebar:
-        choices = (
-            f'{perfum} - {brand}'
-            for perfum, brand in last_prices_df.groupby(['perfum', 'brand']).groups
-        )
-        perfum = st.selectbox('Target Perfum:', choices)
-        st.write(f'Your choice: {perfum}')
+    st.write(f'## {perfum.title()} - {brand.title()}')
+    data = df[df['perfum'] == perfum].copy()
+    data['ts'] = data['ts'].dt.floor(freq='s')
+    data = data.pivot_table(index=['ts'], columns='merchant', values='price')
+
+    st.line_chart(data)
 
     st.markdown(
         f'''
@@ -94,14 +117,8 @@ def main_view(last_prices_df):
 
 def main():
     arguments = get_arguments()
-
     controller = Controller(arguments.database)
-    last_prices_df = controller.get_last_prices()
-
-    main_view(last_prices_df)
-
-    #df = pd.read_csv("my_data.csv")
-    #st.line_chart(df)
+    main_view(controller)
 
 if __name__ == '__main__':
     main()
