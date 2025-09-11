@@ -47,8 +47,8 @@ class Controller:
                 .order_by(models.Prices.ts, models.Perfums.name, models.Prices.price)
             )
 
-            df = pd.DataFrame(query.all())
-            return df
+            self._df = pd.DataFrame(query.all())
+            return self._df
 
     def get_last_prices(self):
         df = self.df
@@ -81,21 +81,32 @@ def side_view(controller):
     return choices[perfum_brand]
 
 def main_view(controller):
-    df = controller.df
-    last_prices_df = controller.get_last_prices()
-    last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
-
     st.set_page_config(
         page_title='Flaire Panel',
         page_icon='🧴'
     )
 
     st.write('# Flaire Panel')
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    start_dt, end_dt = st.slider(
+        'Range of dates',
+        min_value=(today - Controller.DELTA),
+        max_value=tomorrow,
+        value=((today - Controller.DELTA), tomorrow)
+    )
+    df = controller.get_prices_ts(start_dt, end_dt)
+    if df.empty:
+        st.write('🕳️ No perfums in this time range!')
+        return
+
+    last_prices_df = controller.get_last_prices()
+    last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
+
+    st.write('## Most updated prices')
+    st.dataframe(last_prices_df, hide_index=True)
 
     perfum, brand = side_view(controller)
-
-    st.write('## Current Prices')
-    st.dataframe(last_prices_df, hide_index=True)
 
     st.write(f'## {perfum.title()} - {brand.title()}')
     data = df[df['perfum'] == perfum].copy()
