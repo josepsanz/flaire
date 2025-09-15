@@ -20,11 +20,14 @@ logger.setLevel(logging.INFO)
 
 
 class Tracker:
-    def __init__(self, filename):
-        with open(filename, 'r') as fp:
-            self.contract = yaml.load(fp, Loader=yaml.SafeLoader)
-
+    def __init__(self, contract):
+        self.contract = contract
         self._connect_db()
+
+    @classmethod
+    def from_yaml(cls, filename):
+        with open(filename, 'r') as fp:
+            return cls(yaml.load(fp, Loader=yaml.SafeLoader))
 
     def _connect_db(self):
         self._engine = create_engine(f"sqlite:///{self.contract['database']}")
@@ -171,7 +174,7 @@ class Tracker:
 def get_arguments():
     parser = argparse.ArgumentParser(
         prog='python -m flaire.track',
-        description='Flaire track',
+        description='Flaire Track',
         epilog='Scrap, track and smell!'
     )
 
@@ -182,14 +185,14 @@ def get_arguments():
 def main():
     arguments = get_arguments()
 
-    tracker = Tracker(arguments.filename)
+    tracker = Tracker.from_yaml(arguments.filename)
     df = tracker.track()
     tracker.insert_data(df)
 
     print(df)
     print()
 
-    print(f"--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py {tracker.contract['database']}{colorama.Style.RESET_ALL}")
+    print(f"--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py {arguments.filename}{colorama.Style.RESET_ALL}")
 
 if __name__ == '__main__':
     main()
