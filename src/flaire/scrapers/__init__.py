@@ -55,7 +55,7 @@ def safe_price(func):
 def scrape_notino_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
-    obj = soup.find(id='pd-price') or soup.find('span', {'data-testid': 'pd-price-wrapper'})
+    obj = soup.find('span', {'data-testid': 'pd-price-wrapper'}) or soup.find(id='pd-price')
     price = get_price(obj)
 
     return price
