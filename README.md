@@ -29,3 +29,11 @@ Historic prices viewer
 ``` sh
 streamlit run src/flaire/panel.py CONTRACT_YAML 
 ```
+
+Here is what you should view:
+
+<p align="center">
+  <img src="static/flaire.gif" alt="flaire-panel" />
+</p>
+
+

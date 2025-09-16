@@ -120,7 +120,7 @@ def perfumes_head_section(controller):
     return controller.get_prices_ts(start_dt, end_dt)
 
 def perfumes_recent_prices_section(controller):
-    st.write('## Most updated prices')
+    st.write('## Last prices')
 
     last_prices_df = controller.get_last_prices()
     last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
@@ -158,15 +158,14 @@ def perfumes_price_trend_section(controller):
         st.line_chart(pvt)
 
     with col2:
-        st.image(img_link)
-        #st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
+        #st.image(img_link)
+        st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
 
     st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
     st.markdown('Merchant prices:')
     for merchant, group_df in data.groupby('merchant'):
-        merchant_link = group_df['merchant_link'].iloc[0]
-        st.markdown(f'  - [{merchant.title()}]({merchant_link})')
-
+        price, merchant_link = group_df[['price', 'merchant_link']].iloc[-1]
+        st.markdown(f'- [{merchant.title()} - {price}€]({merchant_link})')
 
 def main_view(controller):
     st.set_page_config(
@@ -190,8 +189,8 @@ def main_view(controller):
         )
         return
 
-    perfumes_recent_prices_section(controller)
     perfumes_price_trend_section(controller)
+    perfumes_recent_prices_section(controller)
 
 def main():
     arguments = get_arguments()
