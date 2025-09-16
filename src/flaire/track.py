@@ -62,10 +62,12 @@ class Tracker:
         brand = target['brand']
         type_ = target['type']
         size = target['size']
+        info_link = target.get('info')
+        img_link = target.get('img')
 
         sig = cls.get_signature(name, brand, type_, size)
 
-        for url, task in zip(target['links'], target['tasks']):
+        for merchant_link, task in zip(target['links'], target['tasks']):
             merchant = task['merchant']
             price = task['task'].get()
             yield {
@@ -75,7 +77,10 @@ class Tracker:
                 'type': type_.lower(),
                 'size': size,
                 'merchant': cls.norm_text(merchant),
-                'price': price
+                'price': price,
+                'info_link': info_link,
+                'img_link': img_link,
+                'merchant_link': merchant_link,
             }
 
     @classmethod
@@ -112,25 +117,42 @@ class Tracker:
             session.add(entity)
 
     @classmethod
-    def _insert_perfum(cls, session, name: str, brand: str, type_: str, size: int, sig: str):
-        if not cls.get_entity_id_by_name(session, models.Perfums, name):
+    def _insert_perfume(
+            cls,
+            session,
+            name: str,
+            brand: str,
+            type_: str,
+            size: int,
+            info_link: str,
+            img_link: str,
+            sig: str
+    ):
+        if not cls.get_entity_id_by_name(session, models.Perfumes, name):
             brand_id = cls.get_entity_id_by_name(session, models.Brands, brand)
-            perfum = models.Perfums(
+            perfume = models.Perfumes(
                 name=name,
                 brand_id=brand_id,
                 type=type_,
                 size=int(size),
-                sig=sig
+                info_link=info_link,
+                img_link=img_link,
+                sig=sig,
             )
-            session.add(perfum)
+            session.add(perfume)
 
     @classmethod
-    def _insert_price(cls, session, perfum_name: str, merchant_name: str, price: float):
-        perfum_id = cls.get_entity_id_by_name(session, models.Perfums, perfum_name)
+    def _insert_price(cls, session, perfume_name: str, merchant_name: str, price: float, link: str):
+        perfume_id = cls.get_entity_id_by_name(session, models.Perfumes, perfume_name)
         merchant_id = cls.get_entity_id_by_name(session, models.Merchants, merchant_name)
         price = int(100 * price)
         ts = datetime.datetime.now()
-        price = models.Prices(perfum_id=perfum_id, merchant_id=merchant_id, ts=ts, price=price)
+        price = models.Prices(perfume_id=perfume_id, merchant_id=merchant_id, ts=ts, price=price)
+
+        merchant_link = models.MerchantLinks(
+            perfume_id=perfume_id, merchant_id=merchant_id, link=link
+        )
+        session.merge(merchant_link)
         session.add(price)
 
     def insert_data(self, df: pd.DataFrame):
@@ -145,25 +167,27 @@ class Tracker:
                 self._insert_brand(session, brand)
             session.commit()
 
-            # Insert perfums and prices
+            # Insert perfumes and prices
             groups = df.groupby('sig')
             for sig, group in groups:
                 pf = group.iloc[0]
-                perfum_name = pf['name']
+                perfume_name = pf['name']
 
-                self._insert_perfum(
+                self._insert_perfume(
                     session,
-                    name=perfum_name,
+                    name=perfume_name,
                     brand=pf['brand'],
                     type_=pf['type'],
                     size=pf['size'],
+                    info_link=pf['info_link'],
+                    img_link=pf['img_link'],
                     sig=pf['sig']
                 )
                 session.commit()
 
                 for _, row in group.iterrows():
                     merchant_name = row['merchant']
-                    self._insert_price(session, perfum_name, merchant_name, row['price'])
+                    self._insert_price(session, perfume_name, merchant_name, row['price'], row['merchant_link'])
                 session.commit()
 
     def track(self):
@@ -189,7 +213,7 @@ def main():
     df = tracker.track()
     tracker.insert_data(df)
 
-    print(df)
+    print(df[['name', 'brand', 'merchant', 'price']])
     print()
 
     print(f"--> {colorama.Style.BRIGHT}streamlit run src/flaire/panel.py {arguments.filename}{colorama.Style.RESET_ALL}")

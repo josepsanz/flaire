@@ -6,14 +6,14 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
-merchant_perfum = sa.Table(
-    'merchant_perfum',
+merchant_perfume = sa.Table(
+    'merchant_perfume',
     Base.metadata,
     sa.Column('merchant_id', sa.Integer, sa.ForeignKey('merchants.id', ondelete='CASCADE'), primary_key=True),
-    sa.Column('perfum_id', sa.Integer, sa.ForeignKey('perfums.id', ondelete='CASCADE'), primary_key=True)
+    sa.Column('perfume_id', sa.Integer, sa.ForeignKey('perfumes.id', ondelete='CASCADE'), primary_key=True)
 )
 
-class PerfumType(enum.Enum):
+class PerfumeType(enum.Enum):
     edt = 'edt'
     edp = 'edp'
     parfum = 'parfum'
@@ -29,15 +29,22 @@ class Merchants(FlaireBase, Base):
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False, unique=True)
-    perfums = relationship(
-        'Perfums',
-        secondary=merchant_perfum,
+    perfumes = relationship(
+        'Perfumes',
+        secondary=merchant_perfume,
         back_populates='merchant',
         passive_deletes=True
     )
 
     prices = relationship(
         'Prices',
+        back_populates='merchant',
+        cascade='all, delete-orphan',
+        passive_deletes=True
+    )
+
+    merchant_links = relationship(
+        'MerchantLinks',
         back_populates='merchant',
         cascade='all, delete-orphan',
         passive_deletes=True
@@ -53,8 +60,8 @@ class Brands(FlaireBase, Base):
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False, unique=True)
 
-    perfums = relationship(
-        'Perfums',
+    perfumes = relationship(
+        'Perfumes',
         back_populates='brand',
         cascade='all, delete-orphan',
         passive_deletes=True
@@ -63,30 +70,44 @@ class Brands(FlaireBase, Base):
     def __repr__(self):
         return f'<{self.__class__.__name__}(name={self.name})>'
 
-class Perfums(FlaireBase, Base):
-    __tablename__ = 'perfums'
+class Perfumes(FlaireBase, Base):
+    __tablename__ = 'perfumes'
     __table_args__ = (
-        sa.UniqueConstraint('sig', name='uq_perfum_sig'),
+        sa.UniqueConstraint('sig', name='uq_perfume_sig'),
     )
     __lut__ = {}
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     name = sa.Column(sa.String, nullable=False)
     brand_id = sa.Column(sa.Integer, sa.ForeignKey('brands.id', ondelete='CASCADE'), nullable=False)
-    type = sa.Column(sa.Enum(PerfumType), nullable=False)
+    type = sa.Column(sa.Enum(PerfumeType), nullable=False)
     size = sa.Column(sa.Integer, nullable=False)
+    info_link = sa.Column(sa.String, nullable=True)
+    img_link = sa.Column(sa.String, nullable=True)
     sig = sa.Column(sa.String(32), nullable=False, unique=True)  # md5 hash hex string
 
-    brand = relationship('Brands', back_populates='perfums')
+    brand = relationship(
+        'Brands',
+        back_populates='perfumes'
+    )
+
     merchant = relationship(
         'Merchants',
-        secondary=merchant_perfum,
-        back_populates='perfums',
+        secondary=merchant_perfume,
+        back_populates='perfumes',
         passive_deletes=True
     )
+
     prices = relationship(
         'Prices',
-        back_populates='perfum',
+        back_populates='perfume',
+        cascade='all, delete-orphan',
+        passive_deletes=True
+    )
+
+    merchant_links = relationship(
+        'MerchantLinks',
+        back_populates='perfume',
         cascade='all, delete-orphan',
         passive_deletes=True
     )
@@ -98,13 +119,27 @@ class Prices(FlaireBase, Base):
     __tablename__ = 'prices'
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    perfum_id = sa.Column(sa.Integer, sa.ForeignKey('perfums.id', ondelete='CASCADE'), nullable=False)
+    perfume_id = sa.Column(sa.Integer, sa.ForeignKey('perfumes.id', ondelete='CASCADE'), nullable=False)
     merchant_id = sa.Column(sa.Integer, sa.ForeignKey('merchants.id', ondelete='CASCADE'), nullable=False)
     ts = sa.Column(sa.DateTime, default=datetime.datetime.now, nullable=False)
     price = sa.Column(sa.Integer, nullable=False)
 
-    perfum = relationship('Perfums', back_populates='prices')
+    perfume = relationship('Perfumes', back_populates='prices')
     merchant = relationship('Merchants', back_populates='prices')
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}(perfum_id={self.perfum_id}, ts={self.ts}, price={self.price})>'
+        return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, ts={self.ts}, price={self.price})>'
+
+class MerchantLinks(FlaireBase, Base):
+    __tablename__ = 'merchant_links'
+
+    perfume_id = sa.Column(sa.Integer, sa.ForeignKey('perfumes.id', ondelete='CASCADE'), nullable=False, primary_key=True)
+    merchant_id = sa.Column(sa.Integer, sa.ForeignKey('merchants.id', ondelete='CASCADE'), nullable=False, primary_key=True)
+
+    link = sa.Column(sa.String, nullable=False)
+
+    perfume = relationship('Perfumes', back_populates='merchant_links')
+    merchant = relationship('Merchants', back_populates='merchant_links')
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, merchant_id={self.merchant_id}, price_id={self.price_id}, link={self.link})>'

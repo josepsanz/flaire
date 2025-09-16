@@ -1,10 +1,12 @@
-database: perfums.db
+database: perfumes.db
 
 track:
   - name: Asad
     brand: Lattafa
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Asad-72821.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.72821.avif
     links:
       - https://www.notino.es/lattafa/asad-eau-de-parfum-para-hombre
       - https://www.brasty.es/lattafa-asad-eau-de-parfum-para-hombre-100-ml
@@ -16,6 +18,8 @@ track:
     brand: Lattafa
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Asad-Bourbon-101124.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.101124.avif
     links:
       - https://www.notino.es/lattafa/asad-bourbon-eau-de-parfum-para-hombre
       - https://www.druni.es/asad-bourbon-lattafa-eau-parfum-hombre
@@ -26,6 +30,8 @@ track:
     brand: Afnan
     type: edp
     size: 150
+    info: https://www.fragrantica.com/perfume/Afnan/Supremacy-Not-Only-Intense-68271.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.68271.avif
     links:
       - https://www.brasty.es/afnan-supremacy-not-only-intense-perfume-para-hombre-150-ml
       - https://www.ferwer.es/afnan-supremacy-not-only-intense-extracto-de-perfume-para-hombres/p-11607
@@ -34,6 +40,8 @@ track:
     brand: Afnan
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Afnan/Supremacy-Not-Only-Intense-68271.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.68271.avif
     links:
       - https://www.brasty.es/afnan-supremacy-not-only-intense-eau-de-parfum-para-hombre-100-ml
       - https://www.ferwer.es/afnan-supremacy-not-only-intense-extracto-de-perfume-para-hombres/p-10994
@@ -42,6 +50,8 @@ track:
     brand: Afnan
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Afnan/Supremacy-Collector-s-Edition-Pour-Homme-98689.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.98689.avif
     links:
       - https://www.deloox.es/producto/1343240/afnan-supremacy-eau-de-parfum-edicion-de-coleccionista-100-ml.html
       - https://www.brasty.es/afnan-supremacy-collector-s-edition-eau-de-parfum-para-hombre-100-ml
@@ -50,13 +60,18 @@ track:
     brand: Armaf
     type: elixir
     size: 100
+    info: https://www.fragrantica.com/perfume/Armaf/Odyssey-Mandarin-Sky-Elixir-106709.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.106709.avif
     links:
       - https://www.miravia.es/p/armaf-odyssey-mandarin-sky-elixir-eau-de-parfum-100ml-perume-arabe-original-para-hombre-i1373294636273528.html
+      - https://www.notino.es/armaf/odyssey-mandarin-sky-elixir-eau-de-parfum-unisex
 
   - name: Khamrah Qahwa
     brand: Lattafa
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Khamrah-Qahwa-88175.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.88175.avif
     links:
       - https://www.notino.es/lattafa/khamrah-qahwa-eau-de-parfum-unisex
       - https://www.brasty.es/lattafa-khamrah-qahwa-eau-de-parfum-unisex-100-ml
@@ -67,6 +82,8 @@ track:
     brand: Lattafa
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Khamrah-Dukhan-104529.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.104529.avif
     links:
       - https://www.notino.es/lattafa/khamrah-dukhan-eau-de-parfum-unisex
       - https://www.brasty.es/lattafa-khamrah-dukhan-eau-de-parfum-unisex-100-ml
@@ -76,6 +93,8 @@ track:
     brand: French Avenue
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/French-Avenue/Liquid-Brun-94713.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.94713.avif
     links:
       - https://www.notino.es/french-avenue/liquid-brun-eau-de-parfum-unisex
       - https://www.deloox.es/producto/1355229/french-avenue-liquid-brun-eau-de-parfum-100-ml.html
@@ -85,6 +104,8 @@ track:
     brand: Al Haramain
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Al-Haramain-Perfumes/Amber-Oud-White-Edition-73210.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.73210.avif
     links:
       - https://www.brasty.es/al-haramain-amber-oud-white-edition-eau-de-parfum-unisex-100-ml
       - https://www.ferwer.es/al-haramain-amber-oud-white-edition-agua-de-perfume-unisex
@@ -94,6 +115,8 @@ track:
     brand: Lattafa
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Ameer-Al-Oudh-Intense-Oud-64947.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.64947.avif
     links:
       - https://www.deloox.es/producto/1253524/lattafa-ameer-al-oudh-intense-oud-eau-de-parfum-100-ml.html
       - https://www.brasty.es/lattafa-ameer-al-oudh-intense-oud-eau-de-parfum-para-hombre-100-ml
@@ -105,6 +128,8 @@ track:
     brand: Afnan
     type: edp
     size: 100
+    info: https://www.fragrantica.com/perfume/Afnan/9pm-65414.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.65414.avif
     links:
       - https://www.deloox.es/producto/1227857/afnan-9-pm-eau-de-parfum-100-ml.html
       - https://www.ferwer.es/afnan-9pm-agua-de-perfume-para-hombre

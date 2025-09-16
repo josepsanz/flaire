@@ -47,16 +47,20 @@ class Controller:
             query = (
                 session.query(
                     models.Prices.ts,
-                    models.Perfums.name.label('perfum'),
+                    models.Perfumes.name.label('perfume'),
                     models.Brands.name.label('brand'),
                     models.Merchants.name.label('merchant'),
-                    (models.Prices.price / 100.0).label('price')
+                    (models.Prices.price / 100.0).label('price'),
+                    models.Perfumes.info_link.label('info_link'),
+                    models.Perfumes.img_link.label('img_link'),
+                    models.MerchantLinks.link.label('merchant_link'),
                 )
-                .join(models.Perfums, models.Prices.perfum_id == models.Perfums.id)
-                .join(models.Brands, models.Perfums.brand_id == models.Brands.id)
+                .join(models.Perfumes, models.Prices.perfume_id == models.Perfumes.id)
+                .join(models.Brands, models.Perfumes.brand_id == models.Brands.id)
                 .join(models.Merchants, models.Prices.merchant_id == models.Merchants.id)
+                .join(models.MerchantLinks, sa.and_(models.MerchantLinks.perfume_id == models.Perfumes.id, models.MerchantLinks.merchant_id == models.Merchants.id))
                 .filter(models.Prices.ts >= start_dt, models.Prices.ts <= end_dt)
-                .order_by(models.Prices.ts, models.Perfums.name, models.Prices.price)
+                .order_by(models.Prices.ts, models.Perfumes.name, models.Prices.price)
             )
 
             self._df = pd.DataFrame(query.all())
@@ -64,9 +68,9 @@ class Controller:
 
     def get_last_prices(self):
         df = self.df
-        groups = df.groupby(['perfum', 'merchant'])
+        groups = df.groupby(['perfume', 'merchant'])
 
-        it = (group.iloc[-1] for (perfum, merchant), group in groups)
+        it = (group.iloc[-1] for (perfume, merchant), group in groups)
         ddf = pd.DataFrame(it)
         return ddf
 
@@ -93,7 +97,15 @@ def side_section(controller):
         unsafe_allow_html=True
     )
 
-def perfums_head_section(controller):
+    with st.sidebar:
+        st.markdown(f'Track current prices')
+        if st.button('Tracker', icon='⚙️'):
+            controller.track()
+            print('-' * 80)
+            now = datetime.datetime.now()
+            st.write(f'Last track at: {now}')
+
+def perfumes_head_section(controller):
     st.write('# Flaire Panel')
 
     today = datetime.date.today()
@@ -107,33 +119,30 @@ def perfums_head_section(controller):
 
     return controller.get_prices_ts(start_dt, end_dt)
 
-def perfums_recent_prices_section(controller):
+def perfumes_recent_prices_section(controller):
     st.write('## Most updated prices')
-    if st.button('Tracker', icon='⚙️'):
-        controller.track()
-        print('-' * 80)
-        now = datetime.datetime.now()
-        st.write(f'Last track at: {now}')
 
     last_prices_df = controller.get_last_prices()
     last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
-    st.dataframe(last_prices_df, hide_index=True)
 
-def perfums_price_trend_section(controller):
-    st.write(f'## Perfum price trend')
+    df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price']]
+    st.dataframe(df, hide_index=True)
+
+def perfumes_price_trend_section(controller):
+    st.write(f'## Perfume price trend')
 
     df = controller.df
 
     choices = {
-        f'{perfum} - {brand}': (perfum, brand)
-        for perfum, brand in controller.df.groupby(['perfum', 'brand']).groups
+        f'{perfume} - {brand}': (perfume, brand)
+        for perfume, brand in controller.df.groupby(['perfume', 'brand']).groups
     }
-    perfum_brand = st.selectbox('Target Perfum:', choices)
-    st.write(f'Your choice: {perfum_brand}')
-    perfum, brand = choices[perfum_brand]
+    perfume_brand = st.selectbox('Target Perfume:', choices)
+    st.write(f'Your choice: {perfume_brand}')
+    perfume, brand = choices[perfume_brand]
 
-    st.write(f'### {perfum.title()} - {brand.title()}')
-    data = df[df['perfum'] == perfum].copy()
+    st.write(f'### {perfume.title()} - {brand.title()}')
+    data = df[df['perfume'] == perfume].copy()
     data['ts'] = data['ts'].dt.floor(freq='s')
     data = data.pivot_table(index=['ts'], columns='merchant', values='price')
 
@@ -145,15 +154,24 @@ def main_view(controller):
         page_icon='🧴'
     )
 
-    df = perfums_head_section(controller)
+    side_section(controller)
+    df = perfumes_head_section(controller)
     if df.empty:
-        st.write('🕳️')
-        st.write('No perfums in this time range!')
+        st.markdown(
+            """
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 4em; line-height: 1;">🕳️</span>
+            <div style="text-align: center; font-size: 1.2em; margin-top: 0.5em;">
+            No perfumes in this time range!
+            </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         return
 
-    perfums_recent_prices_section(controller)
-    perfums_price_trend_section(controller)
-    #side_section(controller)
+    perfumes_recent_prices_section(controller)
+    perfumes_price_trend_section(controller)
 
 def main():
     arguments = get_arguments()
