@@ -19,7 +19,7 @@ alembic upgrade head
 Track current prices
 
 ``` sh
-python -m flaire.track tests/fixtures/track.yml
+python -m flaire.track CONTRACT_YAML
 ```
 
 ## Panel
@@ -27,5 +27,5 @@ python -m flaire.track tests/fixtures/track.yml
 Historic prices viewer
 
 ``` sh
-streamlit run src/flaire/panel.py DATABASE
+streamlit run src/flaire/panel.py CONTRACT_YAML 
 ```
