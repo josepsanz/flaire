@@ -125,8 +125,17 @@ def perfumes_recent_prices_section(controller):
     last_prices_df = controller.get_last_prices()
     last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
 
-    df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price']]
-    st.dataframe(df, hide_index=True)
+    df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price', 'merchant_link']].copy()
+    st.data_editor(
+        df,
+        column_config={
+            'merchant_link': st.column_config.LinkColumn('link', display_text='🔗')
+        },
+        hide_index=True,
+        width='stretch',
+        #width='content',
+    )
+
 
 def perfumes_price_trend_section(controller):
     st.write(f'## Perfume price trend')
