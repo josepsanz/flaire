@@ -136,9 +136,8 @@ def perfumes_recent_prices_section(controller):
         #width='content',
     )
 
-
 def perfumes_price_trend_section(controller):
-    st.write(f'## Perfume price trend')
+    st.write(f'## Perfume Price Trend')
 
     df = controller.df
 
@@ -147,15 +146,27 @@ def perfumes_price_trend_section(controller):
         for perfume, brand in controller.df.groupby(['perfume', 'brand']).groups
     }
     perfume_brand = st.selectbox('Target Perfume:', choices)
-    st.write(f'Your choice: {perfume_brand}')
     perfume, brand = choices[perfume_brand]
 
-    st.write(f'### {perfume.title()} - {brand.title()}')
     data = df[df['perfume'] == perfume].copy()
-    data['ts'] = data['ts'].dt.floor(freq='s')
-    data = data.pivot_table(index=['ts'], columns='merchant', values='price')
+    info_link, img_link = data[['info_link', 'img_link']].iloc[0]
 
-    st.line_chart(data)
+    col1, _, col2 = st.columns([2, .1, 1])
+    with col1:
+        data['ts'] = data['ts'].dt.floor(freq='s')
+        pvt = data.pivot_table(index=['ts'], columns='merchant', values='price')
+        st.line_chart(pvt)
+
+    with col2:
+        st.image(img_link)
+        #st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
+
+    st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
+    st.markdown('Merchant prices:')
+    for merchant, group_df in data.groupby('merchant'):
+        merchant_link = group_df['merchant_link'].iloc[0]
+        st.markdown(f'  - [{merchant.title()}]({merchant_link})')
+
 
 def main_view(controller):
     st.set_page_config(
