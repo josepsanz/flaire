@@ -120,7 +120,7 @@ def perfumes_head_section(controller):
     return controller.get_prices_ts(start_dt, end_dt)
 
 def perfumes_recent_prices_section(controller):
-    st.write('## Last prices')
+    st.write('## Last Prices')
 
     last_prices_df = controller.get_last_prices()
     last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
