@@ -1,6 +1,18 @@
 database: perfumes.db
 
 track:
+  - name: Shaghaf Oud
+    brand: Swiss Arabian
+    type: edp
+    size: 75
+    info: https://www.fragrantica.com/perfume/Swiss-Arabian/Shaghaf-Oud-50582.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.50582.avif
+    links:
+      - https://www.notino.es/swiss-arabian/shaghaf-oud-eau-de-parfum-para-hombre
+      - https://www.deloox.es/producto/1333369/swiss-arabian-shaghaf-oud-eau-de-parfum-75-ml.html
+      - https://www.brasty.es/swiss-arabian-shaghaf-eau-de-parfum-para-mujer-75-ml
+      - https://www.ferwer.es/swiss-arabian-shaghaf-oud-agua-de-perfume-unisex
+
   - name: Asad
     brand: Lattafa
     type: edp
