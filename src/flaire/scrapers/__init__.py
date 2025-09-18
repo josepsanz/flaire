@@ -10,6 +10,11 @@ from botasaurus.soupify import soupify
 MAX_RETRY = 3
 RETRY_WAIT = 10
 
+NOT_AVAILABLE_TEXT = {
+    'NOT_AVAILABLE',
+    'NO DISPONIBLE',
+}
+
 logger = logging.getLogger(__name__)
 
 scrap_request = functools.partial(
@@ -157,6 +162,7 @@ def scrape_ferwer_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
     obj = soup.find('span', id='api_price')
-    price = get_price(obj)
+    status = soup.find('span', class_='group-product-status-word').get_text().strip().upper()
 
+    price = None if status in NOT_AVAILABLE_TEXT else get_price(obj)
     return price
