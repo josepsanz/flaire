@@ -161,9 +161,13 @@ def perfumes_recent_prices_section(controller):
         #width='content',
     )
 
-    st.markdown('### Some results ')
-    st.markdown(f'- Number of tracks: {len(df)}')
-    st.markdown(f"- Number of perfumes: {df['perfume'].nunique()}")
+    st.markdown('### Current Results ')
+    st.markdown(f'- Number of tracks: {len(controller.last_prices_df):,}')
+    st.markdown(f"- Number of perfumes: {controller.last_prices_df['perfume'].nunique():,}")
+
+    st.markdown('### Total Results ')
+    st.markdown(f'- Number of tracks: {len(controller.prices_df):,}')
+    st.markdown(f"- Number of perfumes: {controller.prices_df['perfume'].nunique():,}")
 
 def perfumes_price_trend_section(controller):
     st.write(f'## Perfume Price Trend')
