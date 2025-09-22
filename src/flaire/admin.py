@@ -1,5 +1,5 @@
 """
-FLAIRE_DATABASE= uvicorn flaire.admin:app --host 127.0.0.1 --port 8302
+FLAIRE_DATABASE= uvicorn flaire.admin:app --host 127.0.0.1 --port 8503
 """
 import os
 import argparse
