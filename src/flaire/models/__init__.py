@@ -127,6 +127,13 @@ class Prices(FlaireBase, Base):
     perfume = relationship('Perfumes', back_populates='prices')
     merchant = relationship('Merchants', back_populates='prices')
 
+    last_price = relationship(
+        'LastPrices',
+        back_populates='price',
+        uselist=True,
+        passive_deletes=True
+    )
+
     def __repr__(self):
         return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, ts={self.ts}, price={self.price})>'
 
@@ -143,3 +150,12 @@ class MerchantLinks(FlaireBase, Base):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, merchant_id={self.merchant_id}, price_id={self.price_id}, link={self.link})>'
+
+class LastPrices(FlaireBase, Base):
+    __tablename__ = 'last_prices'
+
+    price_id = sa.Column(sa.Integer, sa.ForeignKey('prices.id', ondelete='CASCADE'), nullable=False, primary_key=True)
+    price = relationship('Prices', back_populates='last_price')
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}(price_id={self.price_id})>'

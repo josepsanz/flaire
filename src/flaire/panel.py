@@ -62,7 +62,6 @@ class Controller:
                 .filter(models.Prices.ts >= start_dt, models.Prices.ts <= end_dt)
                 .order_by(models.Prices.ts, models.Perfumes.name, models.Prices.price)
             )
-
             self._df = pd.DataFrame(query.all())
             return self._df
 
@@ -72,7 +71,7 @@ class Controller:
 
         it = (group.iloc[-1] for (perfume, merchant), group in groups)
         ddf = pd.DataFrame(it)
-        return ddf
+        return ddf.sort_values(['perfume', 'price'])
 
 def get_arguments():
     parser = argparse.ArgumentParser(
@@ -119,22 +118,28 @@ def perfumes_head_section(controller):
 
     return controller.get_prices_ts(start_dt, end_dt)
 
+def get_best_choices(last_prices_df):
+    return {perfume: df.sort_value(price) for perfume, df in last_prices_df.groupby('perfume')}
+
 def perfumes_recent_prices_section(controller):
     st.write('## Last Prices')
-
     last_prices_df = controller.get_last_prices()
-    last_prices_df['price'] = last_prices_df['price'].map(lambda x: f'{x:.02f}€')
 
     df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price', 'merchant_link']].copy()
     st.data_editor(
         df,
         column_config={
-            'merchant_link': st.column_config.LinkColumn('link', display_text='🔗')
+            'merchant_link': st.column_config.LinkColumn('link', display_text='🔗'),
+            'price': st.column_config.NumberColumn('Price (in €)', format='%.02f€')
         },
         hide_index=True,
         width='stretch',
         #width='content',
     )
+
+    st.markdown('### Some results ')
+    st.markdown(f'- Number of tracks: {len(df)}')
+    st.markdown(f"- Number of perfumes: {df['perfume'].nunique()}")
 
 def perfumes_price_trend_section(controller):
     st.write(f'## Perfume Price Trend')
@@ -163,9 +168,15 @@ def perfumes_price_trend_section(controller):
 
     st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
     st.markdown('Merchant prices:')
+
+    merchant_data = []
     for merchant, group_df in data.groupby('merchant'):
         price, merchant_link = group_df[['price', 'merchant_link']].iloc[-1]
-        st.markdown(f'- [{merchant.title()} - {price}€]({merchant_link})')
+        merchant_data.append((price, merchant, merchant_link))
+
+    merchant_data.sort(key=lambda price, *_: price)
+    for price, merchant, merchant_link in merchant_data:
+        st.markdown(f'- [{merchant.title()} - {price:.02f}€]({merchant_link})')
 
 def main_view(controller):
     st.set_page_config(

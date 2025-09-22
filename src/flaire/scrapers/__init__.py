@@ -61,8 +61,11 @@ def scrape_notino_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
     obj = soup.find('span', {'data-testid': 'pd-price-wrapper'}) or soup.find(id='pd-price')
-    price = get_price(obj)
+    price1 = get_price(obj)
+    obj = soup.find('span', {'data-testid': 'pd-price'})
+    price2 = get_price(obj) if obj else price1
 
+    price = price1 if price1 < price2 else price2
     return price
 
 @scrap_request
@@ -151,9 +154,13 @@ def scrape_amazon_price(request: Request, data):
 def scrape_douglas_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
-    obj = soup.find('div', class_='discounted-price__row').find_all('div')[-1]
-    price = get_price(obj)
+    obj = soup.find('div', class_='discounted-price__row')
+    if obj:
+        obj = obj.find_all('div')[-1]
+    else:
+        obj = soup.find('div', class_='product-price')
 
+    price = get_price(obj)
     return price
 
 @scrap_request
