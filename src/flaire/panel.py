@@ -97,17 +97,6 @@ class Controller:
         self._last_prices_df = pd.DataFrame(query.all())
         return self._last_prices_df
 
-def get_arguments():
-    parser = argparse.ArgumentParser(
-        prog=f'python -m streamlit run {__file__}',
-        description='Flaire Panel',
-        epilog='View historic prices'
-    )
-
-    parser.add_argument('filename', help='YaML file with track info')
-    arguments = parser.parse_args()
-    return arguments
-
 def side_section(controller):
     st.markdown(
         f'''
@@ -233,6 +222,17 @@ def main_view(controller):
 
     perfumes_price_trend_section(controller)
     perfumes_recent_prices_section(controller)
+
+def get_arguments():
+    parser = argparse.ArgumentParser(
+        prog=f'python -m streamlit run {__file__}',
+        description='Flaire Panel',
+        epilog='View historic prices'
+    )
+
+    parser.add_argument('filename', help='YaML file with track info')
+    arguments = parser.parse_args()
+    return arguments
 
 def main():
     arguments = get_arguments()

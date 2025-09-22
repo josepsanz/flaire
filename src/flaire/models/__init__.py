@@ -2,9 +2,11 @@ import enum
 import datetime
 
 import sqlalchemy as sa
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from .base import Base
+from .admin import User
+
 
 merchant_perfume = sa.Table(
     'merchant_perfume',
@@ -84,7 +86,7 @@ class Perfumes(FlaireBase, Base):
     size = sa.Column(sa.Integer, nullable=False)
     info_link = sa.Column(sa.String, nullable=True)
     img_link = sa.Column(sa.String, nullable=True)
-    sig = sa.Column(sa.String(32), nullable=False, unique=True)  # md5 hash hex string
+    sig = sa.Column(sa.String(32), nullable=False)  # md5 hash hex string
 
     brand = relationship(
         'Brands',
@@ -149,7 +151,7 @@ class MerchantLinks(FlaireBase, Base):
     merchant = relationship('Merchants', back_populates='merchant_links')
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, merchant_id={self.merchant_id}, price_id={self.price_id}, link={self.link})>'
+        return f'<{self.__class__.__name__}(perfume_id={self.perfume_id}, merchant_id={self.merchant_id}, link={self.link})>'
 
 class LastPrices(FlaireBase, Base):
     __tablename__ = 'last_prices'
