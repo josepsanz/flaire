@@ -18,7 +18,8 @@ class Controller:
         self._engine = create_engine(f"sqlite:///{contract['database']}")
         self._session = sessionmaker(bind=self._engine)
         self._tracker = track.Tracker(contract)
-        self._df = None
+        self._prices_df = None
+        self._last_prices_df = None
 
     @classmethod
     def from_yaml(cls, filename):
@@ -26,16 +27,23 @@ class Controller:
             return cls(yaml.load(fp, Loader=yaml.SafeLoader))
 
     @property
-    def df(self):
-        if self._df is None:
-            self._df = self.get_prices_ts()
+    def prices_df(self):
+        if self._prices_df is None:
+            self._prices_df = self.get_prices_ts()
 
-        return self._df
+        return self._prices_df
+
+    @property
+    def last_prices_df(self):
+        if self._last_prices_df is None:
+            self._last_prices_df = self.get_last_prices_ts()
+
+        return self._last_prices_df
 
     def track(self):
         current_prices_df = self._tracker.track()
         self._tracker.insert_data(current_prices_df)
-        self._df = None
+        self._prices_df = None
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
         dt = datetime.datetime.now()
@@ -62,16 +70,32 @@ class Controller:
                 .filter(models.Prices.ts >= start_dt, models.Prices.ts <= end_dt)
                 .order_by(models.Prices.ts, models.Perfumes.name, models.Prices.price)
             )
-            self._df = pd.DataFrame(query.all())
-            return self._df
+            self._prices_df = pd.DataFrame(query.all())
+            return self._prices_df
 
-    def get_last_prices(self):
-        df = self.df
-        groups = df.groupby(['perfume', 'merchant'])
+    def get_last_prices_ts(self):
+        with self._session() as session:
+            query = (
+                session.query(
+                    models.Prices.ts,
+                    models.Perfumes.name.label('perfume'),
+                    models.Brands.name.label('brand'),
+                    models.Merchants.name.label('merchant'),
+                    (models.Prices.price / 100.0).label('price'),
+                    models.Perfumes.info_link.label('info_link'),
+                    models.Perfumes.img_link.label('img_link'),
+                    models.MerchantLinks.link.label('merchant_link'),
+                )
+                .join(models.LastPrices, models.Prices.id == models.LastPrices.price_id)
+                .join(models.Perfumes, models.Prices.perfume_id == models.Perfumes.id)
+                .join(models.Brands, models.Perfumes.brand_id == models.Brands.id)
+                .join(models.Merchants, models.Prices.merchant_id == models.Merchants.id)
+                .join(models.MerchantLinks, sa.and_(models.MerchantLinks.perfume_id == models.Perfumes.id, models.MerchantLinks.merchant_id == models.Merchants.id))
+                .order_by(models.Perfumes.name, models.Prices.price)
+            )
 
-        it = (group.iloc[-1] for (perfume, merchant), group in groups)
-        ddf = pd.DataFrame(it)
-        return ddf.sort_values(['perfume', 'price'])
+        self._last_prices_df = pd.DataFrame(query.all())
+        return self._last_prices_df
 
 def get_arguments():
     parser = argparse.ArgumentParser(
@@ -123,7 +147,7 @@ def get_best_choices(last_prices_df):
 
 def perfumes_recent_prices_section(controller):
     st.write('## Last Prices')
-    last_prices_df = controller.get_last_prices()
+    last_prices_df = controller.last_prices_df
 
     df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price', 'merchant_link']].copy()
     st.data_editor(
@@ -144,16 +168,17 @@ def perfumes_recent_prices_section(controller):
 def perfumes_price_trend_section(controller):
     st.write(f'## Perfume Price Trend')
 
-    df = controller.df
+    prices_df = controller.prices_df
+    last_prices_df = controller.last_prices_df
 
     choices = {
         f'{perfume} - {brand}': (perfume, brand)
-        for perfume, brand in controller.df.groupby(['perfume', 'brand']).groups
+        for perfume, brand in prices_df.groupby(['perfume', 'brand']).groups
     }
     perfume_brand = st.selectbox('Target Perfume:', choices)
     perfume, brand = choices[perfume_brand]
 
-    data = df[df['perfume'] == perfume].copy()
+    data = prices_df[prices_df['perfume'] == perfume].copy()
     info_link, img_link = data[['info_link', 'img_link']].iloc[0]
 
     col1, _, col2 = st.columns([2, .1, 1])
@@ -174,9 +199,11 @@ def perfumes_price_trend_section(controller):
         price, merchant_link = group_df[['price', 'merchant_link']].iloc[-1]
         merchant_data.append((price, merchant, merchant_link))
 
+    current_merchants = last_prices_df[last_prices_df['perfume'] == perfume]['merchant'].unique()
     merchant_data.sort(key=lambda price, *_: price)
     for price, merchant, merchant_link in merchant_data:
-        st.markdown(f'- [{merchant.title()} - {price:.02f}€]({merchant_link})')
+        available_emoji = '🟢' if merchant in current_merchants else '🔴'
+        st.markdown(f'- [{merchant.title()} - {price:.02f}€]({merchant_link}) {available_emoji}')
 
 def main_view(controller):
     st.set_page_config(

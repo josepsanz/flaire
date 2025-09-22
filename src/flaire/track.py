@@ -145,18 +145,26 @@ class Tracker:
     def _insert_price(cls, session, perfume_name: str, merchant_name: str, price: float, link: str):
         perfume_id = cls.get_entity_id_by_name(session, models.Perfumes, perfume_name)
         merchant_id = cls.get_entity_id_by_name(session, models.Merchants, merchant_name)
-        price = int(100 * price)
+        amount = int(100 * price)
         ts = datetime.datetime.now()
-        price = models.Prices(perfume_id=perfume_id, merchant_id=merchant_id, ts=ts, price=price)
+        price = models.Prices(perfume_id=perfume_id, merchant_id=merchant_id, ts=ts, price=amount)
 
         merchant_link = models.MerchantLinks(
             perfume_id=perfume_id, merchant_id=merchant_id, link=link
         )
-        session.merge(merchant_link)
+
+        last_price = models.LastPrices(
+            price=price
+        )
+
+        session.merge(merchant_link)  # Upsert
         session.add(price)
+        session.add(last_price)
+
 
     def insert_data(self, df: pd.DataFrame):
         with self._session() as session:
+
             # Insert merchants
             for merchant in df['merchant'].unique():
                 self._insert_merchant(session, merchant)
@@ -165,6 +173,10 @@ class Tracker:
             # Insert brands
             for brand in df['brand'].unique():
                 self._insert_brand(session, brand)
+            session.commit()
+
+            # Delete last_prices table content
+            session.query(models.LastPrices).delete()
             session.commit()
 
             # Insert perfumes and prices
