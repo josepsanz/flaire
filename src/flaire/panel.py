@@ -20,6 +20,7 @@ class Controller:
         self._tracker = track.Tracker(contract)
         self._prices_df = None
         self._last_prices_df = None
+        self.last_update_dt = None
 
     @classmethod
     def from_yaml(cls, filename):
@@ -44,6 +45,7 @@ class Controller:
         current_prices_df = self._tracker.track()
         self._tracker.insert_data(current_prices_df)
         self._prices_df = None
+        self.last_update_dt = datetime.datetime.now()
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
         dt = datetime.datetime.now()
@@ -114,9 +116,9 @@ def side_section(controller):
         if st.button('Tracker', icon='👣', type='tertiary'):
             controller.track()
             print('-' * 80)
-            now = datetime.datetime.now()
-            st.write(f'Last track at: {now}')
 
+        if controller.last_update_dt:
+            st.write(f'Last track at: {controller.last_update_dt}')
 
 def perfumes_head_section(controller):
     st.write('# Flaire Panel')
