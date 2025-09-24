@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine
 from sqladmin import Admin, ModelView
 
-from flaire.models import Perfumes, Merchants, Prices
+from flaire.models import Perfumes, Merchants, Brands, Prices
 from flaire.models.admin import User
 
 
@@ -21,6 +21,18 @@ class PerfumesAdmin(ModelView, model=Perfumes):
     name = 'Perfume'
     column_list = [Perfumes.id, Perfumes.name, Perfumes.type, Perfumes.size, Perfumes.info_link, Perfumes.img_link]
 
+class BrandsAdmin(ModelView, model=Brands):
+    name = 'Brand'
+    column_list = [Brands.id, Brands.name]
+
+class MerchantsAdmin(ModelView, model=Merchants):
+    name = 'Merchant'
+    column_list = [Merchants.id, Merchants.name]
+
+class PricesAdmin(ModelView, model=Prices):
+    name = 'Price'
+    column_list = [Prices.id, Prices.ts, Prices.perfume_id, Prices.merchant_id, Prices.price]
+
 
 def app():
     app = FastAPI()
@@ -28,5 +40,10 @@ def app():
     admin = Admin(app, engine)
     admin.add_view(UserAdmin)
     admin.add_view(PerfumesAdmin)
+    admin.add_view(BrandsAdmin)
+    admin.add_view(MerchantsAdmin)
+    admin.add_view(PricesAdmin)
+
+
     return app
 

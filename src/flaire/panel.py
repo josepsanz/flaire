@@ -110,12 +110,13 @@ def side_section(controller):
     )
 
     with st.sidebar:
-        st.markdown(f'Track current prices')
-        if st.button('Tracker', icon='⚙️'):
+        st.link_button('Admin', icon='🛠', type='tertiary', url='http://127.0.0.1:8503/admin')
+        if st.button('Tracker', icon='👣', type='tertiary'):
             controller.track()
             print('-' * 80)
             now = datetime.datetime.now()
             st.write(f'Last track at: {now}')
+
 
 def perfumes_head_section(controller):
     st.write('# Flaire Panel')
