@@ -239,8 +239,10 @@ def get_arguments():
 
 def main():
     arguments = get_arguments()
-    controller = Controller.from_yaml(arguments.filename)
-    main_view(controller)
+    if 'controller' not in st.session_state:
+        st.session_state.controller = Controller.from_yaml(arguments.filename)
+
+    main_view(st.session_state.controller)
 
 if __name__ == '__main__':
     main()
