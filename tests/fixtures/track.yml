@@ -1,6 +1,26 @@
 database: perfumes.db
 
 track:
+  - name: Artisan
+    brand: John Varvatos
+    type: edt
+    size: 75
+    info: https://www.fragrantica.com/perfume/John-Varvatos/Artisan-5534.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.5534.avif
+    links:
+      - https://perfumerias.com/john-varvatos-artisan-edt-75ml/
+      - https://www.notino.es/john-varvatos/artisan-eau-de-toilette-para-hombre/p-398889/
+
+  - name: Vintage
+    brand: John Varvatos
+    type: edt
+    size: 125
+    info: https://www.fragrantica.com/perfume/John-Varvatos/Vintage-2356.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.2356.avif
+    links:
+      - https://perfumerias.com/john-varvatos-vintage-edt-125ml/
+      - https://www.notino.es/john-varvatos/vintage-eau-de-toilette-para-hombre/p-391175/
+
   - name: Vulcan Sable
     brand: French Avenue
     type: edp
@@ -47,6 +67,7 @@ track:
       - https://www.douglas.es/es/p/5011503009
       - https://www.ferwer.es/agua-de-perfume-lattafa-asad-para-hombres
       - https://www.primor.eu/es_es/lattafa-asad-eau-de-parfum-126177.html
+      - https://perfumerias.com/asad-edp-100ml/
 
   - name: Asad Bourbon
     brand: Lattafa
@@ -59,6 +80,7 @@ track:
       - https://www.druni.es/asad-bourbon-lattafa-eau-parfum-hombre
       - https://www.deloox.es/producto/1351503/lattafa-asad-bourbon-eau-de-parfum-100-ml.html
       - https://www.ferwer.es/lattafa-asad-bourbon-agua-de-perfume-para-hombre
+      - https://perfumerias.com/asad-bourbon-edp-100ml/
 
   - name: Supremacy Not Only Intense Perfume (150ml)
     brand: Afnan
@@ -80,6 +102,7 @@ track:
       - https://www.brasty.es/afnan-supremacy-not-only-intense-eau-de-parfum-para-hombre-100-ml
       - https://www.ferwer.es/afnan-supremacy-not-only-intense-extracto-de-perfume-para-hombres/p-10994
       - https://www.notino.es/afnan/supremacy-not-only-intense-eau-de-parfum-para-hombre
+      - https://perfumerias.com/supremacy-not-only-intense-extrait-de-parfum/
 
   - name: Sumpremacy Collector's Edition
     brand: Afnan
@@ -159,6 +182,7 @@ track:
       - https://www.brasty.es/lattafa-ameer-al-oudh-intense-oud-eau-de-parfum-para-hombre-100-ml
       - https://www.ferwer.es/lattafa-ameer-al-oudh-intense-oud-parfemovana-voda-unisex/p-9659/
       - https://www.notino.es/lattafa/ameer-al-oudh-intense-oud-eau-de-parfum-unisex
+      - https://perfumerias.com/m/lattafa/ameer-al-oudh-intense-oud-edp/
 
   - name: 9 PM
     brand: Afnan
@@ -171,3 +195,4 @@ track:
       - https://www.ferwer.es/afnan-9pm-agua-de-perfume-para-hombre
       - https://www.brasty.es/afnan-9-pm-eau-de-parfum-para-hombre-100-ml
       - https://www.notino.es/afnan/9-pm-eau-de-parfum-para-hombre
+      - https://perfumerias.com/9-pm-edp-100ml/

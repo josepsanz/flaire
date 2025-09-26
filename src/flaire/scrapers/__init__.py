@@ -13,6 +13,7 @@ RETRY_WAIT = 10
 NOT_AVAILABLE_TEXT = {
     'NOT_AVAILABLE',
     'NO DISPONIBLE',
+    'NO ESTA DISPONIBLE'
 }
 
 logger = logging.getLogger(__name__)
@@ -112,10 +113,12 @@ def _scrape_primor_price(driver, data):
 @scrap_request
 @safe_price
 def scrape_primor_price(request: Request, data):
+    price = None
     soup = get_soup_from_url(request, url=data['url'])
 
-    obj = soup.find('div', class_='prices').find('div', class_='normal-price').find('span', class_='price')
-    price = get_price(obj)
+    if (obj := soup.find('div', {'x-show': '!isAvailable'})):
+        obj = soup.find('div', class_='prices').find('div', class_='normal-price').find('span', class_='price')
+        price = get_price(obj)
 
     return price
 
@@ -172,4 +175,13 @@ def scrape_ferwer_price(request: Request, data):
     status = soup.find('span', class_='group-product-status-word').get_text().strip().upper()
 
     price = None if status in NOT_AVAILABLE_TEXT else get_price(obj)
+    return price
+
+@scrap_request
+@safe_price
+def scrape_perfumerias_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
+
+    obj = soup.find('div', class_='precio')
+    price = get_price(obj)
     return price
