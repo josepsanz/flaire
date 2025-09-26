@@ -10,6 +10,7 @@ import streamlit as st
 
 from flaire import models, track
 
+MD_PAD = '&nbsp;'
 
 class Controller:
     DELTA = datetime.timedelta(days=180)
@@ -45,6 +46,7 @@ class Controller:
         current_prices_df = self._tracker.track()
         self._tracker.insert_data(current_prices_df)
         self._prices_df = None
+        self._last_prices_df = None
         self.last_update_dt = datetime.datetime.now()
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
@@ -72,8 +74,9 @@ class Controller:
                 .filter(models.Prices.ts >= start_dt, models.Prices.ts <= end_dt)
                 .order_by(models.Prices.ts, models.Perfumes.name, models.Prices.price)
             )
-            self._prices_df = pd.DataFrame(query.all())
-            return self._prices_df
+            prices_df = pd.DataFrame(query.all())
+            self._prices_df = prices_df
+            return prices_df
 
     def get_last_prices_ts(self):
         with self._session() as session:
@@ -132,7 +135,8 @@ def perfumes_head_section(controller):
         value=((today - Controller.DELTA), tomorrow)
     )
 
-    return controller.get_prices_ts(start_dt, end_dt)
+    prices_df = controller.get_prices_ts(start_dt, end_dt)
+    return prices_df
 
 def get_best_choices(last_prices_df):
     return {perfume: df.sort_value(price) for perfume, df in last_prices_df.groupby('perfume')}
@@ -184,7 +188,6 @@ def perfumes_price_trend_section(controller):
         st.line_chart(pvt)
 
     with col2:
-        #st.image(img_link)
         st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
 
     st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
@@ -199,7 +202,7 @@ def perfumes_price_trend_section(controller):
     merchant_data.sort(key=lambda price, *_: price)
     for price, merchant, merchant_link in merchant_data:
         available_emoji = '🟢' if merchant in current_merchants else '🔴'
-        st.markdown(f'- [{merchant.title()} - {price:.02f}€]({merchant_link}) {available_emoji}')
+        st.markdown(f'{available_emoji} {2 * MD_PAD}  [{merchant.title()} - {price:.02f}€]({merchant_link})')
 
 def main_view(controller):
     st.set_page_config(
