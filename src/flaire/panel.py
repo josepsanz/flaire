@@ -172,11 +172,12 @@ def perfumes_price_trend_section(controller):
     last_prices_df = controller.last_prices_df
 
     choices = {
-        f'{perfume} - {brand}': (perfume, brand)
-        for perfume, brand in prices_df.groupby(['perfume', 'brand']).groups
+        f'{perfume} - {brand}': (idx, perfume, brand)
+        for idx, (perfume, brand) in enumerate(prices_df.groupby(['perfume', 'brand']).groups)
     }
-    perfume_brand = st.selectbox('Target Perfume:', choices)
-    perfume, brand = choices[perfume_brand]
+
+    st.session_state.perfume_brand = st.selectbox('Target Perfume:', choices)
+    _, perfume, brand = choices[st.session_state.perfume_brand]
 
     data = prices_df[prices_df['perfume'] == perfume].copy()
     info_link, img_link = data[['info_link', 'img_link']].iloc[0]
