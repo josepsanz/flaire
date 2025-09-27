@@ -176,7 +176,8 @@ def perfumes_price_trend_section(controller):
         for idx, (perfume, brand) in enumerate(prices_df.groupby(['perfume', 'brand']).groups)
     }
 
-    st.session_state.perfume_brand = st.selectbox('Target Perfume:', choices)
+    index, *_ = choices.get(st.session_state.get('perfume_brand'), (0,))
+    st.session_state.perfume_brand = st.selectbox('Target Perfume:', choices, index=index)
     _, perfume, brand = choices[st.session_state.perfume_brand]
 
     data = prices_df[prices_df['perfume'] == perfume].copy()
