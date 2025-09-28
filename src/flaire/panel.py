@@ -20,7 +20,7 @@ class Controller:
         self._session = sessionmaker(bind=self._engine)
         self._tracker = track.Tracker(contract)
         self._prices_df = None
-        self._last_prices_df = None
+        self._current_prices_df = None
         self.last_update_dt = None
 
     @classmethod
@@ -36,17 +36,17 @@ class Controller:
         return self._prices_df
 
     @property
-    def last_prices_df(self):
-        if self._last_prices_df is None:
-            self._last_prices_df = self.get_last_prices_ts()
+    def current_prices_df(self):
+        if self._current_prices_df is None:
+            self._current_prices_df = self.get_current_prices_ts()
 
-        return self._last_prices_df
+        return self._current_prices_df
 
     def track(self):
         current_prices_df = self._tracker.track()
         self._tracker.insert_data(current_prices_df)
         self._prices_df = None
-        self._last_prices_df = None
+        self._current_prices_df = None
         self.last_update_dt = datetime.datetime.now()
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
@@ -78,7 +78,7 @@ class Controller:
             self._prices_df = prices_df
             return prices_df
 
-    def get_last_prices_ts(self):
+    def get_current_prices_ts(self):
         with self._session() as session:
             query = (
                 session.query(
@@ -99,8 +99,21 @@ class Controller:
                 .order_by(models.Perfumes.name, models.Prices.price)
             )
 
-        self._last_prices_df = pd.DataFrame(query.all())
-        return self._last_prices_df
+        self._current_prices_df = pd.DataFrame(query.all())
+        return self._current_prices_df
+
+    def hot_trends(self):
+        prices_df = self.prices_df.copy()
+        prices_df['date'] = prices_df['ts'].dt.date
+        gg = prices_df.groupby('date')
+
+        it = reversed(gg.groups.keys())
+        last_date = next(it)
+        last_sample_df = prices_df.loc[gg.groups[last_date]]
+        ddf = pd.DataFrame(df.iloc[-1] for (perfume, merchant), df in last_sample_df.groupby(['perfume', 'merchant']))
+
+        return ddf
+
 
 def side_section(controller):
     st.markdown(
@@ -138,14 +151,14 @@ def perfumes_head_section(controller):
     prices_df = controller.get_prices_ts(start_dt, end_dt)
     return prices_df
 
-def get_best_choices(last_prices_df):
-    return {perfume: df.sort_value(price) for perfume, df in last_prices_df.groupby('perfume')}
+def get_best_choices(current_prices_df):
+    return {perfume: df.sort_value(price) for perfume, df in current_prices_df.groupby('perfume')}
 
 def perfumes_recent_prices_section(controller):
     st.write('## Last Prices')
-    last_prices_df = controller.last_prices_df
+    current_prices_df = controller.current_prices_df
 
-    df = last_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price', 'merchant_link']].copy()
+    df = current_prices_df[['ts', 'perfume', 'brand', 'merchant', 'price', 'merchant_link']].copy()
     st.data_editor(
         df,
         column_config={
@@ -158,8 +171,8 @@ def perfumes_recent_prices_section(controller):
     )
 
     st.markdown('### Current Results ')
-    st.markdown(f'- Number of tracks: {len(controller.last_prices_df):,}')
-    st.markdown(f"- Number of perfumes: {controller.last_prices_df['perfume'].nunique():,}")
+    st.markdown(f'- Number of tracks: {len(controller.current_prices_df):,}')
+    st.markdown(f"- Number of perfumes: {controller.current_prices_df['perfume'].nunique():,}")
 
     st.markdown('### Total Results ')
     st.markdown(f'- Number of tracks: {len(controller.prices_df):,}')
@@ -169,7 +182,7 @@ def perfumes_price_trend_section(controller):
     st.write(f'## Perfume Price Trend')
 
     prices_df = controller.prices_df
-    last_prices_df = controller.last_prices_df
+    current_prices_df = controller.current_prices_df
 
     choices = {
         f'{perfume} - {brand}': (idx, perfume, brand)
@@ -200,7 +213,7 @@ def perfumes_price_trend_section(controller):
         price, merchant_link = group_df[['price', 'merchant_link']].iloc[-1]
         merchant_data.append((price, merchant, merchant_link))
 
-    current_merchants = last_prices_df[last_prices_df['perfume'] == perfume]['merchant'].unique()
+    current_merchants = current_prices_df[current_prices_df['perfume'] == perfume]['merchant'].unique()
     merchant_data.sort(key=lambda price, *_: price)
     for price, merchant, merchant_link in merchant_data:
         available_emoji = '🟢' if merchant in current_merchants else '🔴'
@@ -229,6 +242,7 @@ def main_view(controller):
         return
 
     perfumes_price_trend_section(controller)
+    controller.hot_trends()
     perfumes_recent_prices_section(controller)
 
 def get_arguments():
