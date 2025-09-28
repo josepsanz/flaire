@@ -177,8 +177,8 @@ def perfumes_price_trend_section(controller):
     }
 
     index, *_ = choices.get(st.session_state.get('perfume_brand'), (0,))
-    st.session_state.perfume_brand = st.selectbox('Target Perfume:', choices, index=index)
-    _, perfume, brand = choices[st.session_state.perfume_brand]
+    perfume_brand = st.selectbox('Target Perfume:', choices, index=index, key='perfume_brand')
+    _, perfume, brand = choices[perfume_brand]
 
     data = prices_df[prices_df['perfume'] == perfume].copy()
     info_link, img_link = data[['info_link', 'img_link']].iloc[0]
