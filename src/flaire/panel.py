@@ -3,6 +3,7 @@ import datetime
 
 import yaml
 import pandas as pd
+import ruptures as rpt
 import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,12 +17,16 @@ class Controller:
     DELTA = datetime.timedelta(days=180)
 
     def __init__(self, contract):
+        self._clear_properties()
         self._engine = create_engine(f"sqlite:///{contract['database']}")
         self._session = sessionmaker(bind=self._engine)
         self._tracker = track.Tracker(contract)
+        self.last_update_dt = None
+
+    def _clear_properties(self):
         self._prices_df = None
         self._current_prices_df = None
-        self.last_update_dt = None
+        self._pm_trends = None
 
     @classmethod
     def from_yaml(cls, filename):
@@ -42,11 +47,17 @@ class Controller:
 
         return self._current_prices_df
 
+    @property
+    def pm_trends(self):
+        if self._pm_trends is None:
+            self._pm_trends = self.get_pm_trends()
+
+        return self._pm_trends
+
     def track(self):
         current_prices_df = self._tracker.track()
         self._tracker.insert_data(current_prices_df)
-        self._prices_df = None
-        self._current_prices_df = None
+        self._clear_properties()
         self.last_update_dt = datetime.datetime.now()
 
     def get_prices_ts(self, start_dt=None, end_dt=None):
@@ -102,17 +113,21 @@ class Controller:
         self._current_prices_df = pd.DataFrame(query.all())
         return self._current_prices_df
 
-    def hot_trends(self):
-        prices_df = self.prices_df.copy()
-        prices_df['date'] = prices_df['ts'].dt.date
-        gg = prices_df.groupby('date')
+    def get_pm_trends(self, days=7):
+        prices_df = self.prices_df
+        end_date = pd.to_datetime(prices_df['ts'].max().date() + datetime.timedelta(days=1))
+        start_date = end_date - datetime.timedelta(days=days)
+        window_df = prices_df[(prices_df['ts'] >= start_date) & (prices_df['ts'] < end_date)]
 
-        it = reversed(gg.groups.keys())
-        last_date = next(it)
-        last_sample_df = prices_df.loc[gg.groups[last_date]]
-        ddf = pd.DataFrame(df.iloc[-1] for (perfume, merchant), df in last_sample_df.groupby(['perfume', 'merchant']))
+        pm_trends = {}
+        for (perfume, merchant), pm_df in window_df.groupby(['perfume', 'merchant']):
+            signal = pm_df['price'].to_numpy()
+            algo = rpt.Pelt(model='l2', min_size=1, jump=1).fit(signal)
+            *brkpt, _ = algo.predict(pen=1)
+            slope = signal[brkpt[-1]] / signal[brkpt[-1] - 1] if brkpt else 1
+            pm_trends[(perfume, merchant)] = slope
 
-        return ddf
+        return pm_trends
 
 
 def side_section(controller):
@@ -213,11 +228,14 @@ def perfumes_price_trend_section(controller):
         price, merchant_link = group_df[['price', 'merchant_link']].iloc[-1]
         merchant_data.append((price, merchant, merchant_link))
 
+    pm_trends = controller.pm_trends
     current_merchants = current_prices_df[current_prices_df['perfume'] == perfume]['merchant'].unique()
     merchant_data.sort(key=lambda price, *_: price)
     for price, merchant, merchant_link in merchant_data:
+        trend = pm_trends.get((perfume, merchant), 1)
         available_emoji = '🟢' if merchant in current_merchants else '🔴'
-        st.markdown(f'{available_emoji} {2 * MD_PAD}  [{merchant.title()} - {price:.02f}€]({merchant_link})')
+        trend_emoji = '⬇' if trend < 1 else '⬆' if trend > 1 else ''
+        st.markdown(f'{available_emoji} {2 * MD_PAD}  [{merchant.title()} - {price:4.02f}€]({merchant_link}) {trend_emoji}')
 
 def main_view(controller):
     st.set_page_config(
@@ -242,7 +260,6 @@ def main_view(controller):
         return
 
     perfumes_price_trend_section(controller)
-    controller.hot_trends()
     perfumes_recent_prices_section(controller)
 
 def get_arguments():
