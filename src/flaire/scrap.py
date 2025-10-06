@@ -14,6 +14,7 @@ _MERCHANT_SCRAPERS_LU = {
     'miravia': sc.scrape_miravia_price,
     'amazon': sc.scrape_amazon_price,
     'perfumerias': sc.scrape_perfumerias_price,
+    'zara': sc.scrape_zara_price,
 }
 
 def get_merchant_scraper(url: str) -> tuple:

@@ -221,7 +221,7 @@ def perfumes_price_trend_section(controller):
         st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
 
     st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
-    st.markdown('Merchant prices:')
+    st.markdown('### Last merchant prices')
 
     merchant_data = []
     for merchant, group_df in data.groupby('merchant'):

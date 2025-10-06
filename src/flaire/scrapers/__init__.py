@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 
 scrap_request = functools.partial(
     request,
+    output=None,
     max_retry=MAX_RETRY,
     retry_wait=RETRY_WAIT,
     run_async=True,
-    close_on_crash=True,
-    output=None
+    close_on_crash=True
 )
 
 def get_soup_from_url(request, url):
@@ -35,7 +35,9 @@ def get_soup_from_url(request, url):
     return soup
 
 def clean_price_text(text):
-    return float(text.replace('€', '').replace(',', '.').replace('\n', '').replace(' ', ''))
+    text = text.replace('€', '').replace('EUR', '')
+    text = text.replace(',', '.').replace('\n', '').replace(' ', '')
+    return float(text)
 
 def get_price(obj):
     text = obj.get_text()
@@ -183,5 +185,22 @@ def scrape_perfumerias_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
 
     obj = soup.find('div', class_='precio')
+    price = get_price(obj)
+    return price
+
+@browser(
+    output=None,
+    headless=True,
+    run_async=True,
+    close_on_crash=True,
+    block_images_and_css=True,
+)
+def scrape_zara_price(driver, data):
+    driver.google_get(data['url'])
+    response = driver.requests.get(data['url'])
+    response.raise_for_status()
+    soup = soupify(response.text)
+
+    obj = soup.find('span', class_='money-amount__main')
     price = get_price(obj)
     return price

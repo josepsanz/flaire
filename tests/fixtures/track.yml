@@ -1,6 +1,15 @@
 database: perfumes.db
 
 track:
+  - name: Vibrant Leather Extreme
+    brand: Zara
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Zara/Vibrant-Leather-Extreme-102936.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.102936.avif
+    links:
+      - https://www.zara.com/es/ca/vibrant-leather-extreme-edp-100-ml---3-4-fl--oz---p20210844.html
+
   - name: Artisan
     brand: John Varvatos
     type: edt
