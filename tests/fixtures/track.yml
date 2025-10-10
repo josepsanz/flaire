@@ -1,6 +1,15 @@
 database: perfumes.db
 
 track:
+  - name: Vanilla 02 Infinite
+    brand: Zara
+    type: edp
+    size: 100
+    info:
+    img: https://static.zara.net/assets/public/ad0d/6979/10c54d7d8407/e0b2e19d023a/20213011999-e1/20213011999-e1.jpg
+    links:
+      - https://www.zara.com/es/ca/vanilla-02-infinite-parfum-100ml--3-38-fl-oz--p20213011.html
+
   - name: Vibrant Leather Extreme
     brand: Zara
     type: edp

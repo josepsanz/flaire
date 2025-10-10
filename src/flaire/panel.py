@@ -220,7 +220,10 @@ def perfumes_price_trend_section(controller):
     with col2:
         st.markdown(f'![{perfume.title()}!]({img_link} "{perfume.title()}")')
 
-    st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
+    if info_link:
+        st.markdown(f'Fragranctica info: [{perfume.title()} - {brand.title()}]({info_link})')
+    else:
+        st.markdown(f'Fragranctica info: -')
     st.markdown('### Last merchant prices')
 
     merchant_data = []
