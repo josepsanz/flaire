@@ -4,23 +4,24 @@ import argparse
 from . import scrapers as sc
 
 _MERCHANT_SCRAPERS_LU = {
-    'notino': sc.scrape_notino_price,
-    'brasty': sc.scrape_brasty_price,
-    'druni': sc.scrape_druni_price,
-    'douglas': sc.scrape_douglas_price,
-    'primor': sc.scrape_primor_price,
-    'deloox': sc.scrape_deloox_price,
-    'ferwer': sc.scrape_ferwer_price,
-    'miravia': sc.scrape_miravia_price,
-    'amazon': sc.scrape_amazon_price,
-    'perfumerias': sc.scrape_perfumerias_price,
-    'zara': sc.scrape_zara_price,
+    'notino.es': sc.scrape_notino_price,
+    'brasty.es': sc.scrape_brasty_price,
+    'druni.es': sc.scrape_druni_price,
+    'douglas.es': sc.scrape_douglas_price,
+    'primor.eu': sc.scrape_primor_price,
+    'deloox.es': sc.scrape_deloox_price,
+    'ferwer.es': sc.scrape_ferwer_price,
+    'miravia.es': sc.scrape_miravia_price,
+    'amazon.es': sc.scrape_amazon_price,
+    'perfumerias.com': sc.scrape_perfumerias_price,
+    'zara.com': sc.scrape_zara_price,
+    'es.afnan.com': sc.scrape_afnan_official_shop_price,
 }
 
 def get_merchant_scraper(url: str) -> tuple:
-    merchant = urllib.parse.urlparse(url).netloc.replace('www.', '')
-    merchant = merchant[:merchant.find('.')]
-    merchant_scraper = _MERCHANT_SCRAPERS_LU[merchant]
+    domain = urllib.parse.urlparse(url).netloc.replace('www.', '')
+    merchant_scraper = _MERCHANT_SCRAPERS_LU[domain]
+    merchant = domain[:domain.rfind('.')]
     return merchant, merchant_scraper
 
 def get_arguments():

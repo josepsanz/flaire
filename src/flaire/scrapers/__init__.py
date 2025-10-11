@@ -1,3 +1,4 @@
+import re
 import logging
 import functools
 
@@ -203,4 +204,17 @@ def scrape_zara_price(driver, data):
 
     obj = soup.find('span', class_='money-amount__main')
     price = get_price(obj)
+    return price
+
+@scrap_request
+@safe_price
+def scrape_afnan_official_shop_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
+
+    obj = soup.find('sale-price')
+    if not obj:
+        return
+
+    text = re.sub(r'[A-Za-zÀ-ÿ]', '', obj.text)
+    price = clean_price_text(text)
     return price
