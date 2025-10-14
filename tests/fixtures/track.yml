@@ -1,6 +1,30 @@
 database: perfumes.db
 
 track:
+  - name: Daarej Pour Homme
+    brand: Rasasi
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Rasasi/Daarej-pour-Homme-19688.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.19688.avif
+    links:
+      - https://www.notino.es/rasasi/daarej-for-men-eau-de-parfum-para-hombre/p-85159/
+      - https://www.brasty.es/rasasi-daarej-men-eau-de-parfum-para-hombre-100-ml
+      - https://www.deloox.es/producto/1264345/rasasi-daarej-pour-homme-eau-de-parfum-100-ml.html
+      - https://perfumerias.com/daarej-pour-homme-edp/
+
+  - name: Club de Nuit Precieux
+    brand: Armaf
+    type: edp
+    size: 55
+    info: https://www.fragrantica.com/perfume/Armaf/Club-de-Nuit-Precieux-I-93272.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.93272.avif
+    links:
+      - https://www.notino.es/armaf/club-de-nuit-precieux-extracto-de-perfume-unisex
+      - https://www.brasty.es/armaf-club-de-nuit-precieux-i-perfume-para-hombre-55-ml
+      - https://www.deloox.es/producto/1341467/armaf-club-de-nuit-precieux-i-extrait-de-parfum-55-ml.html
+      - https://www.ferwer.es/armaf-club-de-nuit-precieux-i-extracto-de-perfume-unisex/p-11611/
+
   - name: Vanilla 02 Infinite
     brand: Zara
     type: edp
@@ -86,6 +110,7 @@ track:
       - https://www.ferwer.es/agua-de-perfume-lattafa-asad-para-hombres
       - https://www.primor.eu/es_es/lattafa-asad-eau-de-parfum-126177.html
       - https://perfumerias.com/asad-edp-100ml/
+      - https://www.amazon.es/Lattafa-Perfume-Premium-Refreshing-Fragances/dp/B09Y642849
 
   - name: Asad Bourbon
     brand: Lattafa
@@ -99,6 +124,7 @@ track:
       - https://www.deloox.es/producto/1351503/lattafa-asad-bourbon-eau-de-parfum-100-ml.html
       - https://www.ferwer.es/lattafa-asad-bourbon-agua-de-perfume-para-hombre
       - https://perfumerias.com/asad-bourbon-edp-100ml/
+      - https://www.amazon.es/Lattafa-Asad-Bourbon-Parfum-100ml/dp/B0DQJBMZVW
 
   - name: Supremacy Not Only Intense Perfume (150ml)
     brand: Afnan
@@ -122,6 +148,7 @@ track:
       - https://www.notino.es/afnan/supremacy-not-only-intense-eau-de-parfum-para-hombre
       - https://perfumerias.com/supremacy-not-only-intense-extrait-de-parfum/
       - https://es.afnan.com/products/supremacy-not-only-intense
+      - https://www.amazon.es/Afnan-Supremacy-Not-Only-Intense/dp/B07W6WLZKD
 
   - name: Sumpremacy Collector's Edition
     brand: Afnan
@@ -178,6 +205,7 @@ track:
       - https://www.notino.es/french-avenue/liquid-brun-eau-de-parfum-unisex
       - https://www.deloox.es/producto/1355229/french-avenue-liquid-brun-eau-de-parfum-100-ml.html
       - https://www.druni.es/liquid-brun-french-avenue-eau-parfum-unisex
+      - https://www.amazon.es/FRENCH-AVENUE-L%C3%ADquido-Parfum-100ml/dp/B0D8L92LQW
 
   - name: Amber Oud White Edition
     brand: Al Haramain
@@ -204,6 +232,7 @@ track:
       - https://www.notino.es/lattafa/ameer-al-oudh-intense-oud-eau-de-parfum-unisex
       - https://perfumerias.com/m/lattafa/ameer-al-oudh-intense-oud-edp/
       - https://www.douglas.es/es/p/5011666025
+      - https://www.amazon.es/Ameer-Oudh-Intense-Oud-100ml/dp/B08LS9QXZC
 
   - name: 9 PM
     brand: Afnan
