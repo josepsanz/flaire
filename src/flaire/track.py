@@ -20,18 +20,21 @@ logger.setLevel(logging.INFO)
 
 
 class Tracker:
-    def __init__(self, contract):
+    def __init__(self, contract, engine):
         self.contract = contract
-        self._connect_db()
+        self._engine = engine
+        self._session = sessionmaker(bind=self._engine)
 
     @classmethod
     def from_yaml(cls, filename):
         with open(filename, 'r') as fp:
-            return cls(yaml.load(fp, Loader=yaml.SafeLoader))
+            contract = yaml.load(fp, Loader=yaml.SafeLoader)
+            engine = create_engine(f"sqlite:///{contract['database']}")
+            return cls(contract, engine)
 
-    def _connect_db(self):
-        self._engine = create_engine(f"sqlite:///{self.contract['database']}")
-        self._session = sessionmaker(bind=self._engine)
+    @classmethod
+    def _sqlite_connect_db(cls, contract):
+        engine = create_engine(f"sqlite:///{contract['database']}")
 
     @classmethod
     def norm_text(cls, text):

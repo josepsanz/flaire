@@ -16,11 +16,11 @@ MD_PAD = '&nbsp;'
 class Controller:
     DELTA = datetime.timedelta(days=180)
 
-    def __init__(self, contract):
+    def __init__(self, contract, engine):
         self._clear_properties()
-        self._engine = create_engine(f"sqlite:///{contract['database']}")
+        self._engine = engine
         self._session = sessionmaker(bind=self._engine)
-        self._tracker = track.Tracker(contract)
+        self._tracker = track.Tracker(contract, engine)
         self.last_update_dt = None
 
     def _clear_properties(self):
@@ -31,7 +31,9 @@ class Controller:
     @classmethod
     def from_yaml(cls, filename):
         with open(filename, 'r') as fp:
-            return cls(yaml.load(fp, Loader=yaml.SafeLoader))
+            contract = yaml.load(fp, Loader=yaml.SafeLoader)
+            engine = create_engine(f"sqlite:///{contract['database']}")
+            return cls(contract, engine)
 
     @property
     def prices_df(self):
