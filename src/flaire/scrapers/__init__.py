@@ -218,3 +218,23 @@ def scrape_afnan_official_shop_price(request: Request, data):
     text = re.sub(r'[A-Za-zÀ-ÿ]', '', obj.text)
     price = clean_price_text(text)
     return price
+
+@scrap_request
+@safe_price
+def scrape_perfumeriajulia_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
+
+    obj = soup.find('div', class_='product-variants-item-prices')
+    price = get_price(obj)
+
+    return price
+
+@scrap_request
+@safe_price
+def scrape_kiwiku_price(request: Request, data):
+    soup = get_soup_from_url(request, url=data['url'])
+
+    obj = soup.find('span', class_='product-price current-price-value')
+    price = get_price(obj)
+
+    return price

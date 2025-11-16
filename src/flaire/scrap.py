@@ -16,6 +16,8 @@ _MERCHANT_SCRAPERS_LU = {
     'perfumerias.com': sc.scrape_perfumerias_price,
     'zara.com': sc.scrape_zara_price,
     'es.afnan.com': sc.scrape_afnan_official_shop_price,
+    'perfumeriajulia.es': sc.scrape_perfumeriajulia_price,
+    'kiwiku.com': sc.scrape_kiwiku_price,
 }
 
 def get_merchant_scraper(url: str) -> tuple:

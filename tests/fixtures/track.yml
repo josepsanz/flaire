@@ -1,6 +1,71 @@
 database: perfumes.db
 
 track:
+  - name: 05 Domino Essence
+    brand: Maison Alhambra
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Maison-Alhambra/05-Domino-Essence-95503.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.95503.avif
+    links:
+      #- https://es.aliexpress.com/item/1005007696605988.html
+      - https://www.miravia.es/p/i1372566823231197-s2089472084557533.html
+
+  - name: Ombre Notes
+    brand: Khadlaj
+    type: edp
+    size: 100
+    info:
+    img: https://cdn.notinoimg.com/detail_main_mq/khadlaj/6291107974156_01-o/ombre-notes___230811.jpg
+    links:
+      - https://www.notino.es/khadlaj/ombre-notes-eau-de-parfum-unisex/p-16196695
+      - https://www.deloox.es/producto/1302371/khadlaj-ombre-notes-eau-de-parfum-100-ml.html
+
+  - name: Mashrabya
+    brand: Lattafa
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Mashrabya-100127.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.100127.avif
+    links:
+      - https://www.notino.es/lattafa/mashrabya-eau-de-parfum-unisex/p-16299976
+      - https://www.brasty.es/lattafa-mashrabya-eau-de-parfum-unisex-100-ml
+      - https://www.deloox.es/producto/1353189/lattafa-mashrabiya-eau-de-parfum-100-ml.html
+      - https://www.perfumeriajulia.es/910017710-mashrabya-eau-de-parfum.html
+
+  - name: Eternal Oud
+    brand: Lattafa Pride
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Lattafa-Perfumes/Eternal-Oud-78155.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.78155.avif
+    links:
+      - https://www.notino.es/lattafa/pride-eternal-oud-eau-de-parfum-para-mujer/p-16146750/
+      - https://www.brasty.es/lattafa-pride-eternal-oud-eau-de-parfum-unisex-100-ml
+      - https://www.miravia.es/p/i1372967986389470-s2089717129818590.html
+      - https://www.kiwiku.com/lattafa-eternal-oud-eau-de-parfum-unisex-100ml.html
+
+  - name: Rifaaqat
+    brand: Paris Corner
+    type: edp
+    size: 85
+    info: https://www.fragrantica.com/perfume/PARIS-CORNER/Rifaaqat-99060.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.99060.avif
+    links:
+      - https://www.deloox.es/producto/1323468/paris-corner-rifaaqat-eau-de-parfum-85-ml.html
+      - https://www.miravia.es/p/i1365051237011793-s2082325758607697.html
+
+  - name: Midnight Oud
+    brand: Ard al Zaafaran
+    type: edp
+    size: 100
+    info: https://www.fragrantica.com/perfume/Ard-Al-Zaafaran/Midnight-Oud-66534.html
+    img: https://fimgs.net/mdimg/perfume-thumbs/375x500.66534.avif
+    links:
+      - https://www.deloox.es/producto/1315431/ard-al-zaafaran-midnight-oud-eau-de-parfum-100-ml.html
+      - https://www.miravia.es/p/i1373360129317505-s2089967619603073.html
+      - https://www.amazon.es/dp/B07HLVRY76/
+
   - name: Daarej Pour Homme
     brand: Rasasi
     type: edp
