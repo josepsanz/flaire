@@ -76,8 +76,7 @@ def scrape_notino_price(request: Request, data):
 @safe_price
 def scrape_brasty_price(request: Request, data):
     soup = get_soup_from_url(request, url=data['url'])
-
-    obj = soup.find('dl', class_='c-pd-shopbox__row').find('dd')
+    obj = soup.find('p', class_='c-pd-offer__price')
     price = get_price(obj)
 
     return price
